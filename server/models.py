@@ -1,4 +1,4 @@
-from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy_serializer import SerializerMixin, re
 from sqlalchemy.ext.associationproxy import association_proxy
 from config import db, flask_bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -121,13 +121,12 @@ class User(db.Model, SerializerMixin):
     # Serialization rules
     serialize_rules = ('-books.user', '-password_hash')  
 
-    @validates('username')
+    @validates("username")
     def validate_username(self, key, username):
-        if not username or not isinstance(username, str):
-            raise ValueError('Username must be a non-empty string')
-        if len(username) < 3 or len(username) > 50:
-            raise ValueError('Username must be between 3 and 50 characters')
+        if not re.match(r"^[a-zA-Z0-9_]+$", username):
+            raise ValueError("Username must be alphanumeric with underscores only")
         return username
+
 
     @hybrid_property
     def password(self):
