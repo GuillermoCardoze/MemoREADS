@@ -2,6 +2,7 @@ from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.associationproxy import association_proxy
 from config import db, flask_bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import validates
 
 
 class Book(db.Model, SerializerMixin):
@@ -19,13 +20,22 @@ class Book(db.Model, SerializerMixin):
     genre = db.relationship('Genre', back_populates='books')
     user = db.relationship('User', back_populates='books')
 
-    # # Association proxies
-    # author_name = association_proxy('author', 'name')  # Proxy to access author.name
-    # genre_name = association_proxy('genre', 'name')    # Proxy to access genre.name
-    # username = association_proxy('user', 'username')   # Proxy to access user.username
-
     # Serialization rules
     serialize_rules = ('-author.books', '-genre.books', '-user.books')  
+
+    @validates('title')
+    def validate_title(self, key, title):
+        if not title or not isinstance(title, str):
+            raise ValueError('Title must be a non-empty string')
+        if len(title) > 255:
+            raise ValueError('Title cannot exceed 255 characters')
+        return title
+
+    @validates('rating')
+    def validate_rating(self, key, rating):
+        if rating is not None and (not isinstance(rating, int) or rating < 1 or rating > 5):
+            raise ValueError('Rating must be an integer between 1 and 5')
+        return rating
 
     def __repr__(self):
         return (f'<Book ID:{self.id}, Title:{self.title}, Rating:{self.rating}, '
@@ -45,6 +55,22 @@ class Author(db.Model, SerializerMixin):
     # Serialization rules
     serialize_rules = ('-books.author',)  
 
+    @validates('name')
+    def validate_name(self, key, name):
+        if not name or not isinstance(name, str):
+            raise ValueError('Author name must be a non-empty string')
+        if len(name) > 100:
+            raise ValueError('Author name cannot exceed 100 characters')
+        return name
+
+    @validates('description')
+    def validate_description(self, key, description):
+        if not description or not isinstance(description, str):
+            raise ValueError('Description must be a non-empty string')
+        if len(description) > 500:
+            raise ValueError('Description cannot exceed 500 characters')
+        return description
+
     def __repr__(self):
         return f'<Author Name:{self.name}, Description:{self.description}, ID:{self.id}>'
 
@@ -61,6 +87,22 @@ class Genre(db.Model, SerializerMixin):
 
     # Serialization rules
     serialize_rules = ('-books.genre',)  
+
+    @validates('name')
+    def validate_name(self, key, name):
+        if not name or not isinstance(name, str):
+            raise ValueError('Genre name must be a non-empty string')
+        if len(name) > 100:
+            raise ValueError('Genre name cannot exceed 100 characters')
+        return name
+
+    @validates('description')
+    def validate_description(self, key, description):
+        if not description or not isinstance(description, str):
+            raise ValueError('Description must be a non-empty string')
+        if len(description) > 500:
+            raise ValueError('Description cannot exceed 500 characters')
+        return description
 
     def __repr__(self):
         return f'<Genre Name:{self.name}, Description:{self.description}, ID:{self.id}>'
@@ -79,22 +121,29 @@ class User(db.Model, SerializerMixin):
     # Serialization rules
     serialize_rules = ('-books.user', '-password_hash')  
 
-    def __repr__(self):
-        return f'User #{self.id}: {self.username}'
-    
-    @hybrid_property ##hybrid use for objects and a column for query. both object and database.
+    @validates('username')
+    def validate_username(self, key, username):
+        if not username or not isinstance(username, str):
+            raise ValueError('Username must be a non-empty string')
+        if len(username) < 3 or len(username) > 50:
+            raise ValueError('Username must be between 3 and 50 characters')
+        return username
+
+    @hybrid_property
     def password(self):
         raise AttributeError('Passwords are private, set-only')
 
     @password.setter
     def password(self, password_to_validate):
         if not isinstance(password_to_validate, str):
-            raise TypeError('password must be a string')
+            raise TypeError('Password must be a string')
         if len(password_to_validate) < 8:
-            raise ValueError('password must be a string with at least 8 characters')
+            raise ValueError('Password must be at least 8 characters long')
         hashed_password = flask_bcrypt.generate_password_hash(password_to_validate).decode("utf-8")
         self._password_hash = hashed_password
 
     def authenticate(self, password_to_check):
         return flask_bcrypt.check_password_hash(self._password_hash, password_to_check)
-        
+
+    def __repr__(self):
+        return f'User #{self.id}: {self.username}'
