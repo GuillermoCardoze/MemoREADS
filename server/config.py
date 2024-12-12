@@ -1,7 +1,7 @@
 # Standard library imports
 
 # Remote library imports
-from flask import Flask
+from flask import Flask, session
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_restful import Api
@@ -25,6 +25,7 @@ db = SQLAlchemy(metadata=metadata)
 migrate = Migrate(app, db)
 db.init_app(app)
 flask_bcrypt = Bcrypt(app)
+app.secret_key = b'\x99#O\xb0\xbc\x8aWfH#\x84\x1d\xc5\xe5H\xbf'
 
 # Instantiate REST API
 api = Api(app)

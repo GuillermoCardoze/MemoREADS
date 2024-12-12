@@ -1,4 +1,5 @@
-from sqlalchemy_serializer import SerializerMixin, re
+from sqlalchemy_serializer import SerializerMixin
+import re
 from sqlalchemy.ext.associationproxy import association_proxy
 from config import db, flask_bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -115,6 +116,7 @@ class User(db.Model, SerializerMixin):
     username = db.Column(db.String, unique=True, index=True)
     _password_hash = db.Column("password_hash", db.String)
 
+
     # Relationship to Book
     books = db.relationship('Book', back_populates='user', cascade='all, delete-orphan')
 
@@ -126,23 +128,41 @@ class User(db.Model, SerializerMixin):
         if not re.match(r"^[a-zA-Z0-9_]+$", username):
             raise ValueError("Username must be alphanumeric with underscores only")
         return username
-
-
+    
     @hybrid_property
-    def password(self):
-        raise AttributeError('Passwords are private, set-only')
+    def password_hash(self):
+        return self._password_hash
 
-    @password.setter
-    def password(self, password_to_validate):
-        if not isinstance(password_to_validate, str):
-            raise TypeError('Password must be a string')
-        if len(password_to_validate) < 8:
-            raise ValueError('Password must be at least 8 characters long')
-        hashed_password = flask_bcrypt.generate_password_hash(password_to_validate).decode("utf-8")
-        self._password_hash = hashed_password
+    #6.2 Create a setter method to set the password using bcrypt
+    @password_hash.setter
+    def password(self, password):
+        password_hash = flask_bcrypt.generate_password_hash(password.encode('utf-8'))
+        self._password_hash = password_hash.decode('utf-8')
+    #6.3 Create an authentication method to check the password using bcrypt
+    def authenticate(self,password):
+        return flask_bcrypt.check_password_hash(self._password_hash, password.encode("utf-8"))
 
-    def authenticate(self, password_to_check):
-        return flask_bcrypt.check_password_hash(self._password_hash, password_to_check)
 
-    def __repr__(self):
-        return f'User #{self.id}: {self.username}'
+
+
+
+
+
+    # @hybrid_property
+    # def password(self):
+    #     raise AttributeError('Passwords are private, set-only')
+
+    # @password.setter
+    # def password(self, password_to_validate):
+    #     if not isinstance(password_to_validate, str):
+    #         raise TypeError('Password must be a string')
+    #     if len(password_to_validate) < 8:
+    #         raise ValueError('Password must be at least 8 characters long')
+    #     hashed_password = flask_bcrypt.generate_password_hash(password_to_validate).decode("utf-8")
+    #     self._password_hash = hashed_password
+
+    # def authenticate(self, password_to_check):
+    #     return flask_bcrypt.check_password_hash(self._password_hash, password_to_check)
+
+    # def __repr__(self):
+    #     return f'User #{self.id}: {self.username}'

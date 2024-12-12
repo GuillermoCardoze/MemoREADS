@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from flask_restful import Resource, session
+from flask_restful import Resource
 from werkzeug.exceptions import NotFound
-from flask import request, make_response, jsonify, abort
+from flask import request, make_response, jsonify, abort, session, g
 from sqlalchemy.exc import IntegrityError
 
 # Local imports
@@ -132,6 +132,18 @@ class AuthorsById(Resource):
                 return make_response({'errors': "Failed to update author", "message": str(e)},400)
         else:
             return make_response({'error': "Author not found"},404)
+        
+    def delete(self,id):
+        author = Author.query.filter(Author.id==id).first()
+
+        if not author :
+            abort(404, "thr author was not found.")
+
+        db.session.delete(author)
+        db.session.commit()
+
+        return {},204
+
 
 api.add_resource(AuthorsById, "/authors/<int:id>")
 
@@ -180,82 +192,137 @@ class GenresById(Resource):
                 return make_response({'errors': "Failed to update genre", "message": str(e)},400)
         else:
             return make_response({'error': "Genre not found"},404)
+        
+    def delete(self,id):
+        genre = Genre.query.filter(Genre.id==id).first()
+
+        if not genre:
+            abort(404, "thr genre was not found.")
+
+        db.session.delete(genre)
+        db.session.commit()
+
+        return {},204
+
 
 api.add_resource(GenresById, "/genres/<int:id>")
-        
 
-
-
-class CurrentUser(Resource):
-    def get(self):
-        try:
-            if "user_id" in session:
-                if user := db.session.get(User, session["user_id"]):
-                    return make_response(user.to_dict(), 200)
-                del session["user_id"]
-                return make_response({"error": "Unauthorized, user_id in session does not exist, it has been removed"}, 401)
-            return make_response({"error": "Unauthorized, please login!"}, 401)
-        except Exception as e:
-            return make_response({"error": str(e)}, 422)
-        
-api.add_resource(CurrentUser, "/current-user")
-        
-class Login(Resource):
+class Users(Resource):
     def post(self):
-        try:
-            #! 1. Get the data through the request context
-            data = request.json
-            #! Check that you can find a user by that email AND that the password matches
-            user = User.query.filter_by(username=data.get("username", "")).first()
-            if user and user.authenticate(data.get("password", "")):
-                #! if so, you can login the user (aka store their id in the session)
-                session["user_id"] = user.id #! THIS IS HOW WE LOGIN
-                return make_response(user.to_dict(), 200)
-            else:
-                return make_response({"error": "Invalid Credentials"}, 401)
-        except Exception as e:
-            return make_response({"error": str(e)}, 400)
+        form_json = request.get_json()
+
+        new_user = User(
+            username = form_json['username'],
+            password = form_json['password'],
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        session['user_id'] = new_user.id
+        print(session['user_id'])
+        return make_response(
+            new_user.to_dict(), 201)
+api.add_resource(Users, '/signup')
+
+
+@app.before_request
+def check_session():
+    print(session)
+    if session.get("user_id") is None:
+        session["user_id"] = None
+    else:
+        print("User is logged in")
+        print(session["user_id"])        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class CurrentUser(Resource):
+#     def get(self):
+#         try:
+#             if "user_id" in session:
+#                 if user := db.session.get(User, session["user_id"]):
+#                     return make_response(user.to_dict(), 200)
+#                 del session["user_id"]
+#                 return make_response({"error": "Unauthorized, user_id in session does not exist, it has been removed"}, 401)
+#             return make_response({"error": "Unauthorized, please login!"}, 401)
+#         except Exception as e:
+#             return make_response({"error": str(e)}, 422)
         
-api.add_resource(Login, "/login")
+# api.add_resource(CurrentUser, "/current-user")
+        
+# class Login(Resource):
+#     def post(self):
+#         try:
+#             #! 1. Get the data through the request context
+#             data = request.json
+#             #! Check that you can find a user by that email AND that the password matches
+#             user = User.query.filter_by(username=data.get("username", "")).first()
+#             if user and user.authenticate(data.get("password", "")):
+#                 #! if so, you can login the user (aka store their id in the session)
+#                 session["user_id"] = user.id #! THIS IS HOW WE LOGIN
+#                 return make_response(user.to_dict(), 200)
+#             else:
+#                 return make_response({"error": "Invalid Credentials"}, 401)
+#         except Exception as e:
+#             return make_response({"error": str(e)}, 400)
+        
+# api.add_resource(Login, "/login")
 
         
-class Logout(Resource):
-    def delete(self):
-        try:
-            response = make_response({}, 204)
-            #! 1. if no one is logged in, there is no one to logout
-            #! 2. but if we do, then we need to remove their traces from the session
-            if "user_id" in session:
-                del session["user_id"]
-            response.delete_cookie("session")
-            return response
-        except Exception as e:
-            return make_response({"error": str(e)}, 422)
+# class Logout(Resource):
+#     def delete(self):
+#         try:
+#             response = make_response({}, 204)
+#             #! 1. if no one is logged in, there is no one to logout
+#             #! 2. but if we do, then we need to remove their traces from the session
+#             if "user_id" in session:
+#                 del session["user_id"]
+#             response.delete_cookie("session")
+#             return response
+#         except Exception as e:
+#             return make_response({"error": str(e)}, 422)
         
-api.add_resource(Logout, "/logout")
+# api.add_resource(Logout, "/logout")
 
         
-class Signup(Resource):
-    def post(self):
-        #! 1. extract the data out of the request (username, email, psswd)
-        #! 2. Instantiate a user with the info above
-        #! 3. db.session.add(user)
-        #! 4. db.session.commit()
-        #! 5. NOW set the user_id in session
-        try:
-            data = request.json
-            user = User(username=data.get("username"))
-            user.password = data.get("password")
-            db.session.add(user)
-            db.session.commit()
-            session["user_id"] = user.id
-            return make_response(user.to_dict(), 201)
-        except IntegrityError as e:
-            return make_response({"error": str(e.orig)}, 422)
-        except Exception as e:
-            return make_response({"error": str(e)}, 422)
+# class Signup(Resource):
+#     def post(self):
+#         #! 1. extract the data out of the request (username, psswd)
+#         #! 2. Instantiate a user with the info above
+#         #! 3. db.session.add(user)
+#         #! 4. db.session.commit()
+#         #! 5. NOW set the user_id in session
+#         try:
+#             data = request.json
+#             user = User(username=data.get("username"))
+#             user.password = data.get("password")
+#             db.session.add(user)
+#             db.session.commit()
+#             session["user_id"] = user.id
+#             return make_response(user.to_dict(), 201)
+#         except IntegrityError as e:
+#             return make_response({"error": str(e.orig)}, 422)
+#         except Exception as e:
+#             return make_response({"error": str(e)}, 422)
         
-api.add_resource(Signup, "/signup")
+# api.add_resource(Signup, "/signup")
 
 
                 
