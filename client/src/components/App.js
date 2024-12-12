@@ -39,11 +39,18 @@ function handleSignup(e){
   .then(data => setUser(data))
 }
 
+function handleLogout(){
+  fetch("/logout", {
+    method: "DELETE",
+  })
+  .then(setUser(null))
+}
+
 if(user){
   return (
     <>
     <h1>Welcome, {user.username}</h1>
-    <button>Logout</button>
+    <button onClick={handleLogout}>Logout</button>
     </>
   )
 }
