@@ -207,7 +207,7 @@ class GenresById(Resource):
 
 api.add_resource(GenresById, "/genres/<int:id>")
 
-class Users(Resource):
+class Signup(Resource):
     def post(self):
         form_json = request.get_json()
 
@@ -221,7 +221,40 @@ class Users(Resource):
         print(session['user_id'])
         return make_response(
             new_user.to_dict(), 201)
-api.add_resource(Users, '/signup')
+api.add_resource(Signup, '/signup')
+
+class Signin(Resource):
+    def post(self):
+        form_json = request.get_json()
+        username = form_json["username"]
+        password = form_json["password"]
+        user = User.query.filter_by(username=username).first()
+        if user and user.authenticate(password):
+            session["user_id"] = user.id
+            return make_response(user.to_dict(), 200)
+        else:
+            return make_response("Invalid Credentials", 401)
+        
+api.add_resource(Signin, '/signin')    
+
+class Logout(Resource):
+    def delete(self):
+        if session.get('user_id'):
+            session['user_id'] = None
+            print(session['user_id'])
+        return make_response({}, 204)
+api.add_resource(Logout, '/logout')
+
+class CheckSession(Resource):
+    def get(self):
+        user_id = session["user_id"]
+
+        if user_id:
+            user = User.query.filter(User.id==user_id).first()
+            return user.to_dict(),200
+        return {},401
+    
+api.add_resource(CheckSession, '/check_session')
 
 
 @app.before_request
