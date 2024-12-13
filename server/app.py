@@ -17,34 +17,55 @@ def not_found(error):
 class Books(Resource):
     def get(self):
         books = [book.to_dict() for book in Book.query.all()]
+        if not books:
+            return make_response({'message': 'No books found'}, 200)
         return make_response(books, 200)
 
     def post(self):
+        if not request.is_json:
+            return make_response({'error': 'Request must be JSON'}, 400)
+
         try:
             json = request.get_json()
-            author = Author.query.get(json['author_id'])
-            genre = Genre.query.get(json['genre_id'])
-            user = User.query.get(json['user_id'])
 
-            if not author or not genre or not user:
-                return make_response({'error': 'Author, Genre, or User not found'}, 404)
+            # Retrieve related entities
+            author_id = json.get('author_id')
+            genre_id = json.get('genre_id')
+            user_id = json.get('user_id')
 
+            if not author_id or not genre_id or not user_id:
+                return make_response({'error': 'Missing author_id, genre_id, or user_id'}, 400)
+
+            author = Author.query.get(author_id)
+            genre = Genre.query.get(genre_id)
+            user = User.query.get(user_id)
+
+            if not author:
+                return make_response({'error': 'Author not found'}, 404)
+            if not genre:
+                return make_response({'error': 'Genre not found'}, 404)
+            if not user:
+                return make_response({'error': 'User not found'}, 404)
+
+            # Create the book
             book = Book(
-                title = json(['title']),
-                rating = json(['rating']),
-                author = author,
-                genre = genre,
-                user = user
+                title=json['title'],
+                rating=json['rating'],
+                author=author,
+                genre=genre,
+                user=user
             )
 
             db.session.add(book)
             db.session.commit()
 
             return make_response(jsonify(book.to_dict()), 201)
+
         except KeyError as e:
-            return make_response({'error': f'Missing key: {str(e)}'},400)
+            return make_response({'error': f'Missing key: {str(e)}'}, 400)
         except Exception as e:
-            return make_response({'error': 'Failed to create book', 'message':str(e)},500)
+            db.session.rollback()  # Rollback session on error
+            return make_response({'error': 'Failed to create book', 'message': str(e)}, 500)
 
 api.add_resource(Books, '/books')
 
@@ -76,7 +97,7 @@ class BooksById(Resource):
         book = Book.query.filter(Book.id==id).first()
 
         if not book:
-            abort(404, "thr book was not found.")
+            abort(404, "The book was not found.")
 
         db.session.delete(book)
         db.session.commit()
@@ -99,7 +120,7 @@ class Authors(Resource):
                 description = json['description']
             )
             db.session.add(new_author)
-            db.commit()
+            db.session.commit()
             return make_response(new_author.to_dict(), 201)
         
         except ValueError as e:
@@ -160,7 +181,7 @@ class Genres(Resource):
                 description = json['description']
             )
             db.session.add(new_genre)
-            db.commit()
+            db.session.commit()
             return make_response(new_genre.to_dict(), 201)
         except ValueError as e:
             return {'errors': str(e)}, 400
