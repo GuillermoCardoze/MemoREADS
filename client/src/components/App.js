@@ -1,21 +1,43 @@
-// import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router} from "react-router-dom";
-import NavBar from "./NavBar";
+// App.js
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBooks } from '../thunks/booksThunks';
+import { fetchAuthors } from '../thunks/authorsThunks';
+const App = () => {
+  const dispatch = useDispatch();
 
+  const booksState = useSelector((state) => state.books);
+  const authorsState = useSelector((state) => state.authors);
 
-function App() {
+  useEffect(() => {
+    dispatch(fetchBooks());
+    dispatch(fetchAuthors());
+  }, [dispatch]);
+
+  if (booksState.loading || authorsState.loading) return <p>Loading...</p>;
+  if (booksState.error) return <p>Books Error: {booksState.error}</p>;
+  if (authorsState.error) return <p>Authors Error: {authorsState.error}</p>;
 
   return (
-    <Router>
-      <div>
-        <NavBar />
-        
-      </div>
-    </Router>
+    <div>
+      <h1>Books</h1>
+      <ul>
+        {booksState.books.map((book) => (
+          <li key={book.id}>{book.title}</li>
+        ))}
+      </ul>
+      <h1>Authors</h1>
+      <ul>
+        {authorsState.authors.map((author) => (
+          <li key={author.id}>{author.name}</li>
+        ))}
+      </ul>
+    </div>
   );
-}
+};
 
 export default App;
+
 
 
 
