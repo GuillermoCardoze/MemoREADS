@@ -3,20 +3,26 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBooks } from '../thunks/booksThunks';
 import { fetchAuthors } from '../thunks/authorsThunks';
+import { fetchGenres } from '../thunks/genresThunks';
+
+
 const App = () => {
   const dispatch = useDispatch();
 
   const booksState = useSelector((state) => state.books);
   const authorsState = useSelector((state) => state.authors);
+  const genresState = useSelector((state) => state.genres);
 
   useEffect(() => {
     dispatch(fetchBooks());
     dispatch(fetchAuthors());
+    dispatch(fetchGenres());
   }, [dispatch]);
 
-  if (booksState.loading || authorsState.loading) return <p>Loading...</p>;
+  if (booksState.loading || authorsState.loading || genresState.loading) return <p>Loading...</p>;
   if (booksState.error) return <p>Books Error: {booksState.error}</p>;
   if (authorsState.error) return <p>Authors Error: {authorsState.error}</p>;
+  if (authorsState.error) return <p>Genres Error: {genresState.error}</p>;
 
   return (
     <div>
@@ -30,6 +36,12 @@ const App = () => {
       <ul>
         {authorsState.authors.map((author) => (
           <li key={author.id}>{author.name}</li>
+        ))}
+      </ul>
+      <h1>Genres</h1>
+      <ul>
+        {genresState.genres.map((genre) => (
+          <li key={genre.id}>{genre.name}</li>
         ))}
       </ul>
     </div>
