@@ -1,12 +1,14 @@
 // App.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBooks } from '../thunks/booksThunks';
-import { fetchAuthors } from '../thunks/authorsThunks';
-import { fetchGenres } from '../thunks/genresThunks';
-import { signup, signin, logout, checkSession } from '../thunks/usersThunks';
+// import { fetchBooks } from '../thunks/booksThunks';
+// import { fetchAuthors } from '../thunks/authorsThunks';
+// import { fetchGenres } from '../thunks/genresThunks';
+import { signup, signin, logout } from '../thunks/usersThunks';
 import BooksList from './BooksList';
-import AuthorsList from './AuthorsList';
+// import AuthorsList from './AuthorsList';
+import AuthorForm from './AuthorForm';
+import Authors from './Authors';
 import GenresList from './GenresList';
 
 
@@ -23,7 +25,7 @@ const App = () => {
   //   dispatch(fetchBooks());
   //   dispatch(fetchAuthors());
     // dispatch(fetchGenres());
-    dispatch(checkSession());
+    // dispatch(checkSession());
   }, [dispatch]);
 
   // if (booksState.loading || authorsState.loading || genresState.loading) return <p>Loading...</p>;
@@ -54,9 +56,10 @@ const App = () => {
         <div>
           <p>Welcome, {user.username}</p>
           <button onClick={handleLogout}>Logout</button>
-          <BooksList />
-          <AuthorsList />
-          <GenresList />
+          
+          
+         
+          
         </div>
       ) : (
         <div>
@@ -84,7 +87,10 @@ const App = () => {
           <li key={genre.id}>{genre.name}</li>
         ))} */}
       {/* </ul> */}
-        
+      <BooksList />
+      <GenresList />
+      <Authors />
+      <AuthorForm />
     </div>
   );
 };

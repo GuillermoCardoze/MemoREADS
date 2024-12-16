@@ -5,14 +5,15 @@ import {
     addAuthorRequest,
     addAuthorSuccess,
     addAuthorFailure,
-  } from '../actions/authorsActions';
+    updateAuthorSuccess,
+    deleteAuthorSuccess,
+  } from "../actions/authorsActions";
   
-  //Fetch Authors
   export const fetchAuthors = () => async (dispatch) => {
     dispatch(fetchAuthorsRequest());
     try {
-      const response = await fetch('/authors', { method: 'GET' });
-      if (!response.ok) throw new Error('Failed to fetch authors');
+      const response = await fetch("/authors");
+      if (!response.ok) throw new Error("Failed to fetch authors");
       const authors = await response.json();
       dispatch(fetchAuthorsSuccess(authors));
     } catch (error) {
@@ -20,19 +21,44 @@ import {
     }
   };
   
-  // Add Author
   export const addAuthor = (authorData) => async (dispatch) => {
     dispatch(addAuthorRequest());
     try {
-      const response = await fetch('/authors', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/authors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(authorData),
       });
-      if (!response.ok) throw new Error('Failed to add author');
+      if (!response.ok) throw new Error("Failed to add author");
       const author = await response.json();
       dispatch(addAuthorSuccess(author));
     } catch (error) {
       dispatch(addAuthorFailure(error.message));
     }
   };
+  
+  export const updateAuthor = (id, authorData) => async (dispatch) => {
+    try {
+      const response = await fetch(`/authors/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(authorData),
+      });
+      if (!response.ok) throw new Error("Failed to update author");
+      const updatedAuthor = await response.json();
+      dispatch(updateAuthorSuccess(updatedAuthor));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+  
+  export const deleteAuthor = (id) => async (dispatch) => {
+    try {
+      const response = await fetch(`/authors/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to delete author");
+      dispatch(deleteAuthorSuccess(id));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+  
