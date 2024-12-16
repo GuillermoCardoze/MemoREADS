@@ -4,29 +4,29 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchBooks } from '../thunks/booksThunks';
 import { fetchAuthors } from '../thunks/authorsThunks';
 import { fetchGenres } from '../thunks/genresThunks';
-
+import BooksList from './BooksList';
 
 const App = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const booksState = useSelector((state) => state.books);
-  const authorsState = useSelector((state) => state.authors);
-  const genresState = useSelector((state) => state.genres);
+  // const booksState = useSelector((state) => state.books);
+  // const authorsState = useSelector((state) => state.authors);
+  // const genresState = useSelector((state) => state.genres);
 
-  useEffect(() => {
-    dispatch(fetchBooks());
-    dispatch(fetchAuthors());
-    dispatch(fetchGenres());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchBooks());
+  //   dispatch(fetchAuthors());
+  //   dispatch(fetchGenres());
+  // }, [dispatch]);
 
-  if (booksState.loading || authorsState.loading || genresState.loading) return <p>Loading...</p>;
-  if (booksState.error) return <p>Books Error: {booksState.error}</p>;
-  if (authorsState.error) return <p>Authors Error: {authorsState.error}</p>;
-  if (authorsState.error) return <p>Genres Error: {genresState.error}</p>;
+  // if (booksState.loading || authorsState.loading || genresState.loading) return <p>Loading...</p>;
+  // if (booksState.error) return <p>Books Error: {booksState.error}</p>;
+  // if (authorsState.error) return <p>Authors Error: {authorsState.error}</p>;
+  // if (authorsState.error) return <p>Genres Error: {genresState.error}</p>;
 
   return (
     <div>
-      <h1>Books</h1>
+      {/* <h1>Books</h1>
       <ul>
         {booksState.books.map((book) => (
           <li key={book.id}>{book.title}</li>
@@ -42,8 +42,9 @@ const App = () => {
       <ul>
         {genresState.genres.map((genre) => (
           <li key={genre.id}>{genre.name}</li>
-        ))}
-      </ul>
+        ))} */}
+      {/* </ul> */}
+        <BooksList />
     </div>
   );
 };
