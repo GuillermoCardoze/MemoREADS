@@ -1,69 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { signin } from '../thunks/usersThunks';
+import React, { useState } from 'react';
 
-const Login = () => {
-    const dispatch = useDispatch();
-    const { loading, error } = useSelector((state) => state.users);
+const Login = ({ handleSignin, closeLogin }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
 
-    useEffect(() => {
-        dispatch(signin());
-    }, [dispatch]);
+  const validateForm = () => {
+    const newErrors = {};
+    if (!username.trim()) {
+      newErrors.username = 'Username is required.';
+    }
+    if (!password.trim()) {
+      newErrors.password = 'Password is required.';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    // Local state for the login form
-    const [formData, setFormData] = useState({
-        username: '',
-        password: '',
-    });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      handleSignin({ username, password });
+      closeLogin(); // Close the login form after successful validation
+    }
+  };
 
-    // Handle input changes
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
-
-    // Handle form submission
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        dispatch(signin(formData.username, formData.password));
-    };
-
-    return (
-        <div className="login-container">
-            <h1>Login</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="username">Username</label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
-            {error && <p className="error">{error}</p>}
-        </div>
-    );
+  return (
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Username:
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </label>
+        {errors.username && <p style={{ color: 'red' }}>{errors.username}</p>}
+        <br />
+        <label>
+          Password:
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </label>
+        {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
+        <br />
+        <button type="submit">Submit</button>
+        <button type="button" onClick={closeLogin}>
+          Cancel
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default Login;

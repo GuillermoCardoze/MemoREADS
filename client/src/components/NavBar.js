@@ -1,19 +1,43 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import Login from './Login';
+import SignUp from './SignUp';
 
-function NavBar() {
-    return (
-        <nav>
-            <ul>
-                {/* <li><Link to="/">Homepage</Link></li> */}
-                <li><Link to="/home">Home</Link></li>
-                <li><Link to="/login">Login</Link></li>
-                <li><Link to="/signup">Sign Up</Link></li>
-                <li><Link to="/books/user/id">My Book List</Link></li>
-                {/* <li><Link to="/book">My Books</Link></li> */}
-            </ul>
-        </nav>
-    );
-}
+const NavBar = ({ user, handleLogout, handleSignin, handleSignup }) => {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(false);
+
+  const toggleLogin = () => {
+    setShowLogin((prev) => !prev);
+    if (showSignUp) setShowSignUp(false); // Close SignUp if it's open
+  };
+
+  const toggleSignUp = () => {
+    setShowSignUp((prev) => !prev);
+    if (showLogin) setShowLogin(false); // Close Login if it's open
+  };
+
+  return (
+    <nav>
+      <h1>MemoREADS App</h1>
+      {user ? (
+        <div>
+          <h1>Welcome, {user.username}</h1>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
+      ) : (
+        <div>
+          {showLogin && <Login handleSignin={handleSignin} closeLogin={toggleLogin} />}
+          {showSignUp && <SignUp handleSignup={handleSignup} closeSignUp={toggleSignUp} />}
+          {!showLogin && !showSignUp && (
+            <>
+              <button onClick={toggleLogin}>Login</button>
+              <button onClick={toggleSignUp}>Sign Up</button>
+            </>
+          )}
+        </div>
+      )}
+    </nav>
+  );
+};
 
 export default NavBar;
