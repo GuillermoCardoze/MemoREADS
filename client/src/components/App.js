@@ -7,6 +7,7 @@ import { fetchGenres } from '../thunks/genresThunks';
 import { signup, signin, logout, checkSession } from '../thunks/usersThunks';
 import BooksList from './BooksList';
 import AuthorsList from './AuthorsList';
+import GenresList from './GenresList';
 
 
 const App = () => {
@@ -55,6 +56,7 @@ const App = () => {
           <button onClick={handleLogout}>Logout</button>
           <BooksList />
           <AuthorsList />
+          <GenresList />
         </div>
       ) : (
         <div>

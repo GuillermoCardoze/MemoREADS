@@ -1,19 +1,36 @@
-// thunks/genresThunks.js
 import {
     fetchGenresRequest,
     fetchGenresSuccess,
     fetchGenresFailure,
+    addGenreRequest,
+    addGenreSuccess,
+    addGenreFailure,
   } from '../actions/genresActions';
   
   export const fetchGenres = () => async (dispatch) => {
     dispatch(fetchGenresRequest());
     try {
-      const response = await fetch('http://localhost:5555/genres');
+      const response = await fetch('/genres', { method: 'GET' });
       if (!response.ok) throw new Error('Failed to fetch genres');
-      const data = await response.json();
-      dispatch(fetchGenresSuccess(data));
+      const genres = await response.json();
+      dispatch(fetchGenresSuccess(genres));
     } catch (error) {
       dispatch(fetchGenresFailure(error.message));
     }
   };
   
+  export const addGenre = (genreData) => async (dispatch) => {
+    dispatch(addGenreRequest());
+    try {
+      const response = await fetch('/genres', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(genreData),
+      });
+      if (!response.ok) throw new Error('Failed to add genre');
+      const genre = await response.json();
+      dispatch(addGenreSuccess(genre));
+    } catch (error) {
+      dispatch(addGenreFailure(error.message));
+    }
+  };
