@@ -4,28 +4,63 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchBooks } from '../thunks/booksThunks';
 import { fetchAuthors } from '../thunks/authorsThunks';
 import { fetchGenres } from '../thunks/genresThunks';
+import { signup, signin, logout, checkSession } from '../thunks/usersThunks';
 import BooksList from './BooksList';
 
 const App = () => {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   // const booksState = useSelector((state) => state.books);
   // const authorsState = useSelector((state) => state.authors);
   // const genresState = useSelector((state) => state.genres);
+  const { user, loading, error } = useSelector((state) => state.users);
 
-  // useEffect(() => {
+
+  useEffect(() => {
   //   dispatch(fetchBooks());
   //   dispatch(fetchAuthors());
   //   dispatch(fetchGenres());
-  // }, [dispatch]);
+  dispatch(checkSession());
+  }, [dispatch]);
 
   // if (booksState.loading || authorsState.loading || genresState.loading) return <p>Loading...</p>;
   // if (booksState.error) return <p>Books Error: {booksState.error}</p>;
   // if (authorsState.error) return <p>Authors Error: {authorsState.error}</p>;
   // if (authorsState.error) return <p>Genres Error: {genresState.error}</p>;
 
+  const handleSignup = () => {
+    const userData = { username: 'testuser', password: 'password123' };
+    dispatch(signup(userData));
+  };
+
+  const handleSignin = () => {
+    const credentials = { username: 'testuser', password: 'password123' };
+    dispatch(signin(credentials));
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   return (
     <div>
+       <h1>Authentication App</h1>
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error}</p>}
+      {user ? (
+        <div>
+          <p>Welcome, {user.username}</p>
+          <button onClick={handleLogout}>Logout</button>
+          <BooksList />
+        </div>
+      ) : (
+        <div>
+          <button onClick={handleSignup}>Sign Up</button>
+          <button onClick={handleSignin}>Sign In</button>
+          
+        </div>
+      )}
+      
       {/* <h1>Books</h1>
       <ul>
         {booksState.books.map((book) => (
@@ -44,7 +79,7 @@ const App = () => {
           <li key={genre.id}>{genre.name}</li>
         ))} */}
       {/* </ul> */}
-        <BooksList />
+        
     </div>
   );
 };
