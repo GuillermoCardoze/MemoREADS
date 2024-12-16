@@ -30,14 +30,25 @@ export const UPDATE_AUTHOR_SUCCESS = "UPDATE_AUTHOR_SUCCESS";
 export const DELETE_AUTHOR_SUCCESS = "DELETE_AUTHOR_SUCCESS";
 
 
-// Genre Action Types
-export const FETCH_GENRES_REQUEST = 'FETCH_GENRES_REQUEST';
-export const FETCH_GENRES_SUCCESS = 'FETCH_GENRES_SUCCESS';
-export const FETCH_GENRES_FAILURE = 'FETCH_GENRES_FAILURE';
+// Action types for fetching genres
+export const FETCH_GENRES_REQUEST = "FETCH_GENRES_REQUEST";
+export const FETCH_GENRES_SUCCESS = "FETCH_GENRES_SUCCESS";
+export const FETCH_GENRES_FAILURE = "FETCH_GENRES_FAILURE";
 
-export const ADD_GENRE_REQUEST = 'ADD_GENRE_REQUEST';
-export const ADD_GENRE_SUCCESS = 'ADD_GENRE_SUCCESS';
-export const ADD_GENRE_FAILURE = 'ADD_GENRE_FAILURE';
+// Action types for adding a genre
+export const ADD_GENRE_REQUEST = "ADD_GENRE_REQUEST";
+export const ADD_GENRE_SUCCESS = "ADD_GENRE_SUCCESS";
+export const ADD_GENRE_FAILURE = "ADD_GENRE_FAILURE";
+
+// Action types for updating a genre
+export const UPDATE_GENRE_REQUEST = "UPDATE_GENRE_REQUEST";
+export const UPDATE_GENRE_SUCCESS = "UPDATE_GENRE_SUCCESS";
+export const UPDATE_GENRE_FAILURE = "UPDATE_GENRE_FAILURE";
+
+// Action types for deleting a genre
+export const DELETE_GENRE_REQUEST = "DELETE_GENRE_REQUEST";
+export const DELETE_GENRE_SUCCESS = "DELETE_GENRE_SUCCESS";
+export const DELETE_GENRE_FAILURE = "DELETE_GENRE_FAILURE";
 
 
 // User Action Types

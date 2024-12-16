@@ -1,66 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { fetchGenres, addGenre } from './thunks/genresThunk';
-import { fetchGenres, addGenre } from '../thunks/genresThunks';
+import { fetchGenres, addGenre, updateGenre, deleteGenre } from '../thunks/genresThunks';
 
 const GenresList = () => {
   const dispatch = useDispatch();
   const { genres, loading, error } = useSelector((state) => state.genres);
-  const [genreData, setGenreData] = useState({ name: '', description: '' });
 
-  // Fetch genres on mount
   useEffect(() => {
-    dispatch(fetchGenres());
+    dispatch(fetchGenres()); // Fetch genres on component mount
   }, [dispatch]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setGenreData({ ...genreData, [name]: value });
+  const handleAddGenre = () => {
+    const newGenre = {
+      name: 'New Genre',
+      description: 'A newly added genre.',
+    };
+    dispatch(addGenre(newGenre)); // Add a new genre
   };
 
-  const handleAddGenre = (e) => {
-    e.preventDefault();
-    dispatch(addGenre(genreData));
-    setGenreData({ name: '', description: '' });
+  const handleUpdateGenre = (id) => {
+    const updatedData = { name: 'Updated Genre', description: 'Updated description.' };
+    dispatch(updateGenre(id, updatedData)); // Update the genre by id
+  };
+
+  const handleDeleteGenre = (id) => {
+    dispatch(deleteGenre(id)); // Delete the genre by id
   };
 
   return (
     <div>
-      <h1>Genres</h1>
+      <h1>Genres List</h1>
+      <button onClick={handleAddGenre}>Add Genre</button>
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}
       <ul>
         {genres.map((genre) => (
-          <li key={genre.id}>{genre.name}</li>
+          <li key={genre.id}>
+            {genre.name} - {genre.description}
+            <button onClick={() => handleUpdateGenre(genre.id)}>Update</button>
+            <button onClick={() => handleDeleteGenre(genre.id)}>Delete</button>
+          </li>
         ))}
       </ul>
-
-      <h2>Add Genre</h2>
-      <form onSubmit={handleAddGenre}>
-        <div>
-          <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={genreData.name}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Description:</label>
-          <input
-            type="text"
-            name="description"
-            value={genreData.description}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Adding...' : 'Add Genre'}
-        </button>
-      </form>
     </div>
   );
 };

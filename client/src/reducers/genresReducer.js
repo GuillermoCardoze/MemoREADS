@@ -5,7 +5,13 @@ import {
     ADD_GENRE_REQUEST,
     ADD_GENRE_SUCCESS,
     ADD_GENRE_FAILURE,
-  } from '../actions/actionTypes';
+    UPDATE_GENRE_REQUEST,
+    UPDATE_GENRE_SUCCESS,
+    UPDATE_GENRE_FAILURE,
+    DELETE_GENRE_REQUEST,
+    DELETE_GENRE_SUCCESS,
+    DELETE_GENRE_FAILURE,
+  } from "../actions/actionTypes";
   
   const initialState = {
     genres: [],
@@ -15,24 +21,35 @@ import {
   
   export const genresReducer = (state = initialState, action) => {
     switch (action.type) {
-      // Fetch Genres
       case FETCH_GENRES_REQUEST:
+      case ADD_GENRE_REQUEST:
+      case UPDATE_GENRE_REQUEST:
+      case DELETE_GENRE_REQUEST:
         return { ...state, loading: true, error: null };
+  
       case FETCH_GENRES_SUCCESS:
         return { ...state, loading: false, genres: action.payload };
-      case FETCH_GENRES_FAILURE:
-        return { ...state, loading: false, error: action.payload };
-  
-      // Add Genre
-      case ADD_GENRE_REQUEST:
-        return { ...state, loading: true, error: null };
       case ADD_GENRE_SUCCESS:
+        return { ...state, loading: false, genres: [...state.genres, action.payload] };
+      case UPDATE_GENRE_SUCCESS:
         return {
           ...state,
           loading: false,
-          genres: [...state.genres, action.payload],
+          genres: state.genres.map((genre) =>
+            genre.id === action.payload.id ? action.payload : genre
+          ),
         };
+      case DELETE_GENRE_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          genres: state.genres.filter((genre) => genre.id !== action.payload),
+        };
+  
+      case FETCH_GENRES_FAILURE:
       case ADD_GENRE_FAILURE:
+      case UPDATE_GENRE_FAILURE:
+      case DELETE_GENRE_FAILURE:
         return { ...state, loading: false, error: action.payload };
   
       default:
@@ -40,5 +57,5 @@ import {
     }
   };
   
-  
+//   export default genresReducer;
   
