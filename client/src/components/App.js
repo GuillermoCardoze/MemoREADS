@@ -6,6 +6,8 @@ import { fetchAuthors } from '../thunks/authorsThunks';
 import { fetchGenres } from '../thunks/genresThunks';
 import { signup, signin, logout, checkSession } from '../thunks/usersThunks';
 import BooksList from './BooksList';
+import AuthorsList from './AuthorsList';
+
 
 const App = () => {
   const dispatch = useDispatch();
@@ -19,8 +21,8 @@ const App = () => {
   useEffect(() => {
   //   dispatch(fetchBooks());
   //   dispatch(fetchAuthors());
-  //   dispatch(fetchGenres());
-  dispatch(checkSession());
+    // dispatch(fetchGenres());
+    dispatch(checkSession());
   }, [dispatch]);
 
   // if (booksState.loading || authorsState.loading || genresState.loading) return <p>Loading...</p>;
@@ -52,6 +54,7 @@ const App = () => {
           <p>Welcome, {user.username}</p>
           <button onClick={handleLogout}>Logout</button>
           <BooksList />
+          <AuthorsList />
         </div>
       ) : (
         <div>
