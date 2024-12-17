@@ -34,6 +34,7 @@ import {
       });
       const newGenre = await response.json();
       dispatch(addGenreSuccess(newGenre));
+      return newGenre;
     } catch (error) {
       dispatch(addGenreFailure(error.message));
     }

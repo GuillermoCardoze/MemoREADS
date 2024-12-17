@@ -32,8 +32,10 @@ import {
       if (!response.ok) throw new Error("Failed to add author");
       const author = await response.json();
       dispatch(addAuthorSuccess(author));
+      return author;
     } catch (error) {
       dispatch(addAuthorFailure(error.message));
+      throw error;
     }
   };
   
