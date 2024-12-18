@@ -1,11 +1,13 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useState } from 'react';
 
 const Display = () => {
   const booksState = useSelector((state) => state.books);
   const authorsState = useSelector((state) => state.authors);
   const genresState = useSelector((state) => state.genres);
   const { user } = useSelector((state) => state.users);
+  const [searchTerm, setSearchTerm] = useState('');
 
   if (!user) {
     return <p>Please log in to see your books.</p>;
@@ -36,14 +38,33 @@ const Display = () => {
     };
   });
 
+  // Filter books based on the search term (title, author name, or genre name)
+  const filteredBooks = booksWithDetails.filter((book) => {
+    const search = searchTerm.toLowerCase();
+    return (
+      book.title.toLowerCase().includes(search) ||
+      book.authorName.toLowerCase().includes(search) ||
+      book.genreName.toLowerCase().includes(search)
+    );
+  });
+
   return (
     <div>
       <h2>Your Books</h2>
-      {booksWithDetails.length === 0 ? (
+       {/* Search Input */}
+       <input
+        type="text"
+        placeholder="Search by title, author, or genre"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ marginBottom: '10px', padding: '5px', width: '50%' }}
+      />
+
+      {filteredBooks.length === 0 ? (
         <p>You have no books yet.</p>
       ) : (
         <ul>
-          {booksWithDetails.map((book) => (
+          {filteredBooks.map((book) => (
             <li key={book.id}>
               <strong>Title:</strong> {book.title} <br />
               <strong>Rating:</strong> {book.rating} <br />

@@ -8,6 +8,7 @@ import { checkSession, signin, signup, logout } from '../thunks/usersThunks';
 import NavBar from './NavBar';
 import Display from './Display';
 import NewBookForm from './NewBookForm';
+// import Login from './Login';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -50,7 +51,6 @@ const App = () => {
             path="/" 
             element={user ? <Display /> : <p>Please log in or sign up to access your books.</p>} 
           />
-          
           {/* Route for NewBookForm, only accessible when logged in */}
           <Route 
             path="/new-book-form" 

@@ -16,9 +16,7 @@ const NewBookForm = () => {
   const formik = useFormik({
     initialValues: {
       title: '',
-      rating: '',
-      // author_id: '',
-      // genre_id: '',
+      rating: '',   
       authorName: '',
       authorDescription: '',
       genreName: '',

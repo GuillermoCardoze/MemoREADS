@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Login from './Login';
 import SignUp from './SignUp';
-import Display from './Display';
+// import Display from './Display';
 // import NewBookForm from './NewBookForm';
 // import { Link } from react-router-dom
 
@@ -37,7 +37,7 @@ const NavBar = ({ user, handleLogout, handleSignin, handleSignup }) => {
           <h1>Welcome, {user.username}</h1>
           <button onClick={handleLogout}>Logout</button>
           <button onClick={goToAddBook}>Add Book</button> {/* Navigate to /new-book-form */}
-          <button onClick={goToDisplay}>My Books</button> {/* Navigate to /new-book-form */}
+          <button onClick={goToDisplay}>My Books</button> {/* Navigate to / */}
 
         </div>
       ) : (
