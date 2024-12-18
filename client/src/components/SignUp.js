@@ -1,32 +1,40 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { signup } from '../thunks/usersThunks';
+import { useNavigate } from 'react-router-dom';
 
-const SignUp = ({ handleSignup, closeSignUp }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+const SignUp = () => {
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSignup = (e) => {
     e.preventDefault();
-    if (!username || !password) {
-      setError('Both username and password are required.');
+    if (!credentials.username || !credentials.password) {
+      setError('Both fields are required.');
       return;
     }
-    setError('');
-    handleSignup({ username, password });
-    closeSignUp();
+    dispatch(signup(credentials)).then((res) => {
+      if (res?.error) {
+        setError('Signup failed.');
+      } else {
+        navigate(`/${credentials.username}/books-list`);
+      }
+    });
   };
 
   return (
     <div>
       <h2>Sign Up</h2>
-      <form onSubmit={handleSubmit}>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <form onSubmit={handleSignup}>
         <label>
           Username:
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={credentials.username}
+            onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
           />
         </label>
         <br />
@@ -34,14 +42,13 @@ const SignUp = ({ handleSignup, closeSignUp }) => {
           Password:
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={credentials.password}
+            onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
           />
         </label>
         <br />
         <button type="submit">Sign Up</button>
       </form>
-      <button onClick={closeSignUp}>Cancel</button>
     </div>
   );
 };

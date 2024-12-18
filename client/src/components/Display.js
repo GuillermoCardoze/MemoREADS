@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useState } from 'react';
+import { useParams, Navigate } from 'react-router-dom';
 
 const Display = () => {
+  const { username } = useParams(); // Extract username from the URL
   const booksState = useSelector((state) => state.books);
   const authorsState = useSelector((state) => state.authors);
   const genresState = useSelector((state) => state.genres);
   const { user } = useSelector((state) => state.users);
   const [searchTerm, setSearchTerm] = useState('');
 
-  if (!user) {
-    return <p>Please log in to see your books.</p>;
+  // Redirect if the logged-in user's username doesn't match the one in the route
+  if (!user || user.username !== username) {
+    return <Navigate to="/login" replace />;
   }
 
   if (booksState.loading || authorsState.loading || genresState.loading) {
@@ -50,9 +52,9 @@ const Display = () => {
 
   return (
     <div>
-      <h2>Your Books</h2>
-       {/* Search Input */}
-       <input
+      <h2>{username}'s Books</h2>
+      {/* Search Input */}
+      <input
         type="text"
         placeholder="Search by title, author, or genre"
         value={searchTerm}
