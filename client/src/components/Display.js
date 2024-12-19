@@ -9,6 +9,7 @@ const Display = () => {
   const genresState = useSelector((state) => state.genres);
   const { user } = useSelector((state) => state.users);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAllBooks, setShowAllBooks] = useState(true); // Toggle state
   const navigate = useNavigate();
 
   // Redirect if the logged-in user's username doesn't match the one in the route
@@ -42,19 +43,22 @@ const Display = () => {
     };
   });
 
-  // Filter books based on the search term (title, author name, or genre name)
+  // Filter books based on the toggle state and search term
   const filteredBooks = booksWithDetails.filter((book) => {
     const search = searchTerm.toLowerCase();
-    return (
+    const matchesSearch =
       book.title.toLowerCase().includes(search) ||
       book.authorName.toLowerCase().includes(search) ||
-      book.genreName.toLowerCase().includes(search)
-    );
+      book.genreName.toLowerCase().includes(search);
+
+    // Show all books or only "Not Read" books based on toggle
+    return showAllBooks ? matchesSearch : matchesSearch && book.rating === 0;
   });
 
   return (
     <div>
       <h2>{username}'s Books</h2>
+      
       {/* Search Input */}
       <input
         type="text"
@@ -63,9 +67,16 @@ const Display = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         style={{ marginBottom: '10px', padding: '5px', width: '50%' }}
       />
+      {/* Toggle Button */}
+      <button
+        onClick={() => setShowAllBooks((prev) => !prev)}
+        style={{ marginBottom: '50px', padding: '5px', width: '50%' }}
+      >
+        {showAllBooks ? 'Show Not Read Books' : 'Show All Books'}
+      </button>
 
       {filteredBooks.length === 0 ? (
-        <p>You have no books yet.</p>
+        <p>{showAllBooks ? 'No books found.' : 'No unread books found.'}</p>
       ) : (
         <ul>
           {filteredBooks.map((book) => (
@@ -83,7 +94,7 @@ const Display = () => {
               <strong>Author Description:</strong> {book.authorDescription} <br />
               <strong>Genre:</strong> {book.genreName} <br />
               <strong>Genre Description:</strong> {book.genreDescription} <br />
-              <br></br>
+              <br />
             </li>
           ))}
         </ul>
