@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useParams, Navigate, useNavigate } from 'react-router-dom';
+// import { deleteBook } from '../redux/actions'; // Make sure to import the deleteBook action
+import { deleteBook } from '../thunks/booksThunks';
 
 const Display = () => {
   const { username } = useParams(); // Extract username from the URL
@@ -11,6 +13,7 @@ const Display = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAllBooks, setShowAllBooks] = useState(true); // Toggle state
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Redirect if the logged-in user's username doesn't match the one in the route
   if (!user || user.username !== username) {
@@ -55,6 +58,13 @@ const Display = () => {
     return showAllBooks ? matchesSearch : matchesSearch && book.rating === 0;
   });
 
+  // Handle book deletion
+  const handleDelete = (bookId) => {
+    if (window.confirm('Are you sure you want to delete this book?')) {
+      dispatch(deleteBook(bookId)); // Dispatch the deleteBook action
+    }
+  };
+
   return (
     <div>
       <h2>{username}'s Books</h2>
@@ -94,7 +104,15 @@ const Display = () => {
               <strong>Author Description:</strong> {book.authorDescription} <br />
               <strong>Genre:</strong> {book.genreName} <br />
               <strong>Genre Description:</strong> {book.genreDescription} <br />
+              {/* Delete Button */}
+              <button
+                onClick={() => handleDelete(book.id)}
+                style={{ marginTop: '10px', color: 'red' }}
+              >
+                Delete Book
+              </button>
               <br />
+              <br></br>
             </li>
           ))}
         </ul>
