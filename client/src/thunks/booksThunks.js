@@ -29,16 +29,20 @@ import {
   // Add Book Thunk
   export const addBook = (bookData) => async (dispatch) => {
     dispatch(addBookRequest());
+    console.log("Adding book:", bookData);
     try {
       const response = await fetch('http://localhost:5555/books', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bookData),
       });
+      console.log("Response:", response);
       if (!response.ok) throw new Error('Failed to add book');
       const newBook = await response.json();
       dispatch(addBookSuccess(newBook));
+      return newBook;
     } catch (error) {
+      console.error("Error posting book:", error);
       dispatch(addBookFailure(error.message));
     }
   };

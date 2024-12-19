@@ -12,6 +12,7 @@ import NewBookForm from './NewBookForm';
 import Login from './Login';
 import Logout from './Logout';
 import SignUp from './SignUp';
+import Rating from './Ratings';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ const App = () => {
         <NavBar user={user} />
         {loading && <p>Loading...</p>}
         <Routes>
+        <Route path="/rating/:id" element={<Rating />} />
           {/* Route for login */}
           <Route
             path="/login"

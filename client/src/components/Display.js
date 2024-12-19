@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate } from 'react-router-dom';
 
 const Display = () => {
   const { username } = useParams(); // Extract username from the URL
@@ -9,6 +9,7 @@ const Display = () => {
   const genresState = useSelector((state) => state.genres);
   const { user } = useSelector((state) => state.users);
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   // Redirect if the logged-in user's username doesn't match the one in the route
   if (!user || user.username !== username) {
@@ -37,6 +38,7 @@ const Display = () => {
       authorDescription: author?.description || 'No description available',
       genreName: genre?.name || 'Unknown',
       genreDescription: genre?.description || 'No description available',
+      formattedRating: book.rating === 0 ? 'Not Read' : book.rating, // Format rating here
     };
   });
 
@@ -69,11 +71,19 @@ const Display = () => {
           {filteredBooks.map((book) => (
             <li key={book.id}>
               <strong>Title:</strong> {book.title} <br />
-              <strong>Rating:</strong> {book.rating} <br />
+              <strong>Rating:</strong> {book.formattedRating}{' '}
+              <button
+                onClick={() => navigate(`/rating/${book.id}`)}
+                style={{ marginLeft: '10px' }}
+              >
+                Update Rating
+              </button>
+              <br />
               <strong>Author:</strong> {book.authorName} <br />
               <strong>Author Description:</strong> {book.authorDescription} <br />
               <strong>Genre:</strong> {book.genreName} <br />
               <strong>Genre Description:</strong> {book.genreDescription} <br />
+              <br></br>
             </li>
           ))}
         </ul>

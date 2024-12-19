@@ -34,8 +34,8 @@ class Book(db.Model, SerializerMixin):
 
     @validates('rating')
     def validate_rating(self, key, rating):
-        if rating is not None and (not isinstance(rating, int) or rating < 1 or rating > 5):
-            raise ValueError('Rating must be an integer between 1 and 5')
+        if rating is not None and (not isinstance(rating, int) or rating < 0 or rating > 5):
+            raise ValueError('Rating must be an integer between 0 and 5')
         return rating
 
     def __repr__(self):
