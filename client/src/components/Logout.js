@@ -1,7 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-// import { logout } from '../redux/usersThunks';
 import { logout } from '../thunks/usersThunks';
 
 const Logout = () => {

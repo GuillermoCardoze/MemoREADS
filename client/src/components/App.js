@@ -1,10 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-// import { fetchBooks, fetchAuthors, fetchGenres, checkSession } from '../thunks';
-import { fetchBooks } from '../thunks/booksThunks';
-import { fetchAuthors } from '../thunks/authorsThunks';
-import { fetchGenres } from '../thunks/genresThunks';
 import { checkSession } from '../thunks/usersThunks';
 import NavBar from './NavBar';
 import Display from './Display';
@@ -19,9 +15,6 @@ const App = () => {
   const { user, loading } = useSelector((state) => state.users);
 
   useEffect(() => {
-    dispatch(fetchBooks());
-    dispatch(fetchAuthors());
-    dispatch(fetchGenres());
     dispatch(checkSession());
   }, [dispatch]);
 

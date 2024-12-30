@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, Navigate, useNavigate } from 'react-router-dom';
-// import { deleteBook } from '../redux/actions'; // Make sure to import the deleteBook action
-import { deleteBook } from '../thunks/booksThunks';
+import { deleteBook } from '../thunks/usersThunks';
 
 const Display = () => {
   const { username } = useParams(); // Extract username from the URL
-  const booksState = useSelector((state) => state.books);
-  const authorsState = useSelector((state) => state.authors);
-  const genresState = useSelector((state) => state.genres);
-  const { user } = useSelector((state) => state.users);
+  const { user, loading, error } = useSelector((state) => state.users);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAllBooks, setShowAllBooks] = useState(true); // Toggle state
   const navigate = useNavigate();
@@ -20,39 +16,21 @@ const Display = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (booksState.loading || authorsState.loading || genresState.loading) {
+  if (loading) {
     return <p>Loading...</p>;
   }
 
-  if (booksState.error) return <p>Error fetching books: {booksState.error}</p>;
-  if (authorsState.error) return <p>Error fetching authors: {authorsState.error}</p>;
-  if (genresState.error) return <p>Error fetching genres: {genresState.error}</p>;
-
-  // Filter books belonging to the current user
-  const userBooks = booksState.books.filter((book) => book.user_id === user.id);
-
-  // Map userBooks to include additional data from authors and genres
-  const booksWithDetails = userBooks.map((book) => {
-    const author = authorsState.authors.find((author) => author.id === book.author_id);
-    const genre = genresState.genres.find((genre) => genre.id === book.genre_id);
-
-    return {
-      ...book,
-      authorName: author?.name || 'Unknown',
-      authorDescription: author?.description || 'No description available',
-      genreName: genre?.name || 'Unknown',
-      genreDescription: genre?.description || 'No description available',
-      formattedRating: book.rating === 0 ? 'Not Read' : book.rating, // Format rating here
-    };
-  });
+  if (error) {
+    return <p>Error fetching user data: {error}</p>;
+  }
 
   // Filter books based on the toggle state and search term
-  const filteredBooks = booksWithDetails.filter((book) => {
+  const filteredBooks = user.books.filter((book) => {
     const search = searchTerm.toLowerCase();
     const matchesSearch =
       book.title.toLowerCase().includes(search) ||
-      book.authorName.toLowerCase().includes(search) ||
-      book.genreName.toLowerCase().includes(search);
+      book.author?.name?.toLowerCase().includes(search) ||
+      book.genre?.name?.toLowerCase().includes(search);
 
     // Show all books or only "Not Read" books based on toggle
     return showAllBooks ? matchesSearch : matchesSearch && book.rating === 0;
@@ -68,7 +46,7 @@ const Display = () => {
   return (
     <div>
       <h2>{username}'s Books</h2>
-      
+
       {/* Search Input */}
       <input
         type="text"
@@ -92,7 +70,7 @@ const Display = () => {
           {filteredBooks.map((book) => (
             <li key={book.id}>
               <strong>Title:</strong> {book.title} <br />
-              <strong>Rating:</strong> {book.formattedRating}{' '}
+              <strong>Rating:</strong> {book.rating === 0 ? 'Not Read' : book.rating}{' '}
               <button
                 onClick={() => navigate(`/rating/${book.id}`)}
                 style={{ marginLeft: '10px' }}
@@ -100,10 +78,10 @@ const Display = () => {
                 Update Rating
               </button>
               <br />
-              <strong>Author:</strong> {book.authorName} <br />
-              <strong>Author Description:</strong> {book.authorDescription} <br />
-              <strong>Genre:</strong> {book.genreName} <br />
-              <strong>Genre Description:</strong> {book.genreDescription} <br />
+              <strong>Author:</strong> {book.author?.name || 'Unknown'} <br />
+              <strong>Author Description:</strong> {book.author?.description || 'N/A'} <br />
+              <strong>Genre:</strong> {book.genre?.name || 'Unknown'} <br />
+              <strong>Genre Description:</strong> {book.genre?.description || 'N/A'} <br />
               {/* Delete Button */}
               <button
                 onClick={() => handleDelete(book.id)}
@@ -112,7 +90,7 @@ const Display = () => {
                 Delete Book
               </button>
               <br />
-              <br></br>
+              <br />
             </li>
           ))}
         </ul>

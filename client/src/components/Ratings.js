@@ -1,25 +1,24 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateBook } from '../thunks/booksThunks';
+// import { updateBookRating } from '../actions/usersActions';
+import { updateRating } from '../thunks/usersThunks';
 
 const Rating = () => {
   const { id } = useParams(); // Extract book ID from the URL
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const booksState = useSelector((state) => state.books);
+  const { user } = useSelector((state) => state.users);
 
-  // Get the book details for the given ID
-  const book = booksState.books.find((b) => b.id === parseInt(id));
+  // Find the book in the user's books
+  const book = user?.books?.find((b) => b.id === parseInt(id));
   const [rating, setRating] = useState(book?.rating || 0);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await dispatch(updateBook(id, { rating: parseInt(rating, 10) }));
+    if (book) {
+      dispatch(updateRating(book.id, parseInt(rating, 10))); // Dispatch the rating update
       navigate(-1); // Go back to the previous page
-    } catch (error) {
-      console.error('Error updating rating:', error);
     }
   };
 

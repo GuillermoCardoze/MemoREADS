@@ -6,6 +6,7 @@ import { addBook } from '../thunks/booksThunks';
 import { addAuthor } from '../thunks/authorsThunks';
 import { addGenre } from '../thunks/genresThunks';
 import { useNavigate } from 'react-router-dom';
+import { updateUserBooks } from '../actions/usersActions';
 
 const NewBookForm = () => {
   const dispatch = useDispatch();
@@ -30,36 +31,35 @@ const NewBookForm = () => {
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
-        // Step 1: Dispatch addAuthor and wait for its response
         const authorResponse = await dispatch(
           addAuthor({ name: values.authorName, description: values.authorDescription })
         );
 
-        if (!authorResponse || !authorResponse.id) {
-          throw new Error('Failed to create author');
-        }
-
-        // Step 2: Dispatch addGenre and wait for its response
         const genreResponse = await dispatch(
           addGenre({ name: values.genreName, description: values.genreDescription })
         );
 
-        if (!genreResponse || !genreResponse.id) {
-          throw new Error('Failed to create genre');
-        }
-
-        // Step 3: Prepare bookData with the retrieved IDs
         const bookData = {
           title: values.title,
-          rating: 0, // Hardcoded default rating
+          rating: 0,
           user_id: user.id,
-          author_id: authorResponse.id, // Retrieved author ID
-          genre_id: genreResponse.id,   // Retrieved genre ID
+          author_id: authorResponse.id,
+          genre_id: genreResponse.id,
         };
+    
+        const bookResponse = await dispatch(addBook(bookData));
+
+        // Prepare the full book object with related details
+    const newBook = {
+      ...bookResponse, // Assume addBook returns the newly created book
+      author: { id: authorResponse.id, ...authorResponse },
+      genre: { id: genreResponse.id, ...genreResponse },
+    };
 
         // Step 4: Dispatch addBook
-        await dispatch(addBook(bookData));
-        resetForm();
+        // Dispatch action to update user state
+      dispatch(updateUserBooks(newBook));        
+      resetForm();
       } catch (err) {
         console.error('Error adding book:', err.message);
       }
