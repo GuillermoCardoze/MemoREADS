@@ -12,9 +12,6 @@ import {
   checkSessionSuccess,
   checkSessionFailure,
 } from '../actions/usersActions';
-// import { fetchBooks } from './booksThunks';
-// import { fetchAuthors } from './authorsThunks';
-// import { fetchGenres } from './genresThunks';
 import { removeUserBook } from '../actions/usersActions';
 import { updateBookRating } from '../actions/usersActions';
 
@@ -73,11 +70,8 @@ export const checkSession = () => async (dispatch) => {
     const response = await fetch('/check_session');
     if (response.status === 401) throw new Error('Session not active');
     const user = await response.json();
+    console.log("Session data:", user); // Check if new genre appears here
     dispatch(checkSessionSuccess(user));
-     // Fetch user-specific data
-      // dispatch(fetchBooks());
-      // dispatch(fetchAuthors());
-      // dispatch(fetchGenres());
   } catch (error) {
     dispatch(checkSessionFailure(error.message));
   }

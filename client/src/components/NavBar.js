@@ -14,8 +14,9 @@ const NavBar = ({ user }) => {
       {user ? (
         <div>
           <h1>Welcome, {user.username}</h1>
-          <button onClick={() => navigate('/new-book-form')}>Add Book</button>
+          <button onClick={() => navigate('/add-book')}>Add Book</button>
           <button onClick={() => navigate(`/${user.username}/books-list`)}>My Books</button>
+          <button onClick={() => navigate('/genres')}>My Genres</button>
           {/* <button onClick={() => navigate('/login')}>Logout</button> */}
           <Logout />
         </div>

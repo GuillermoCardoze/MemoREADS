@@ -11,6 +11,15 @@ import {
   CHECK_SESSION_REQUEST,
   CHECK_SESSION_SUCCESS,
   CHECK_SESSION_FAILURE,
+  ADD_GENRE_FAILURE,
+  ADD_AUTHOR_FAILURE,
+  ADD_BOOK_FAILURE,
+  ADD_GENRE_SUCCESS,
+  ADD_AUTHOR_SUCCESS,
+  ADD_BOOK_SUCCESS
+  // ADD_AUTHOR_REQUEST,
+  // ADD_BOOK_REQUEST,
+  // ADD_GENRE_REQUEST,
 } from '../actions/actionTypes';
 
 const initialState = {
@@ -109,6 +118,50 @@ export const usersReducer = (state = initialState, action) => {
       
     case CHECK_SESSION_FAILURE:
       return { ...state, loading: false, error: action.payload };
+
+      case ADD_BOOK_SUCCESS:
+        return {
+          ...state,
+          user: {
+            ...state.user,
+            books: [...state.user.books, action.payload],
+          },
+        };
+      
+      case ADD_AUTHOR_SUCCESS:
+        return {
+          ...state,
+          user: {
+            ...state.user,
+            authors: [...(state.user.authors || []), action.payload],
+          },
+        };
+      
+      case ADD_GENRE_SUCCESS:
+        return {
+          ...state,
+          user: {
+            ...state.user,
+            genres: [...(state.user.genres || []), action.payload],
+          },
+        };
+      
+      case ADD_BOOK_FAILURE:
+      case ADD_AUTHOR_FAILURE:
+      case ADD_GENRE_FAILURE:
+        return { ...state, error: action.payload };
+
+      case 'USER_LOADING':
+        return { ...state, loading: true, error: null };
+      case 'USER_SUCCESS':
+        return { ...state, user: action.payload, loading: false, error: null };
+      case 'USER_UPDATE':
+        return { ...state, user: action.payload, error: null };
+      case 'USER_ERROR':
+        return { ...state, loading: false, error: action.payload };
+      case 'USER_LOGOUT':
+        return { ...state, user: null, loading: false, error: null };
+      
 
     default:
       return state;

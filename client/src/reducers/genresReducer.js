@@ -11,7 +11,10 @@ import {
   DELETE_GENRE_REQUEST,
   DELETE_GENRE_SUCCESS,
   DELETE_GENRE_FAILURE,
+  SET_GENRES,
+  ADD_GENRE
 } from "../actions/actionTypes";
+
 
 const initialState = {
   genres: [],
@@ -51,6 +54,17 @@ export const genresReducer = (state = initialState, action) => {
     case UPDATE_GENRE_FAILURE:
     case DELETE_GENRE_FAILURE:
       return { ...state, loading: false, error: action.payload };
+
+    case SET_GENRES:
+      return {
+        ...state,
+        genres: action.payload,  // Set genres from the API
+      };
+    case ADD_GENRE:
+      return {
+        ...state,
+        genres: [...state.genres, action.payload],  // Add the new genre to the list
+      };
 
     default:
       return state;

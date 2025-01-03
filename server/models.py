@@ -22,7 +22,7 @@ class Book(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='books')
 
     # Serialization rules
-    serialize_rules = ('-author.books', '-genre.books', '-user.books')  
+    serialize_rules = ('-author.books', '-genre.books', '-user.books', 'author', 'genre')   
 
     @validates('title')
     def validate_title(self, key, title):
@@ -121,7 +121,7 @@ class User(db.Model, SerializerMixin):
     books = db.relationship('Book', back_populates='user', cascade='all, delete-orphan')
 
     # Serialization rules
-    serialize_rules = ('-books.user', '-password_hash')  
+    serialize_rules = ('-books.user', '-password_hash', 'books.author', 'books.genre')   
 
     @validates("username")
     def validate_username(self, key, username):

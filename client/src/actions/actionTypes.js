@@ -50,6 +50,9 @@ export const DELETE_GENRE_REQUEST = "DELETE_GENRE_REQUEST";
 export const DELETE_GENRE_SUCCESS = "DELETE_GENRE_SUCCESS";
 export const DELETE_GENRE_FAILURE = "DELETE_GENRE_FAILURE";
 
+// Action types
+export const SET_GENRES = 'SET_GENRES';
+export const ADD_GENRE = 'ADD_GENRE';  // New action for adding genre
 
 // User Action Types
 export const SIGNUP_REQUEST = 'SIGNUP_REQUEST';

@@ -37,12 +37,12 @@ const Display = () => {
   });
 
   // Handle book deletion
-  const handleDelete = (bookId) => {
+  const handleDelete = async (bookId) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
-      dispatch(deleteBook(bookId)); // Dispatch the deleteBook action
+      await dispatch(deleteBook(bookId)); // Dispatch deleteBook thunk
     }
   };
-
+  
   return (
     <div>
       <h2>{username}'s Books</h2>
@@ -80,8 +80,8 @@ const Display = () => {
               <br />
               <strong>Author:</strong> {book.author?.name || 'Unknown'} <br />
               <strong>Author Description:</strong> {book.author?.description || 'N/A'} <br />
-              <strong>Genre:</strong> {book.genre?.name || 'Unknown'} <br />
-              <strong>Genre Description:</strong> {book.genre?.description || 'N/A'} <br />
+              {/* <strong>Genre:</strong> {book.genre?.name || 'Unknown'} <br />
+              <strong>Genre Description:</strong> {book.genre?.description || 'N/A'} <br /> */}
               {/* Delete Button */}
               <button
                 onClick={() => handleDelete(book.id)}

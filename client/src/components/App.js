@@ -9,6 +9,8 @@ import Login from './Login';
 import Logout from './Logout';
 import SignUp from './SignUp';
 import Rating from './Ratings';
+import Genres from './Genres';
+import NewGenreForm from './NewGenreForm';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -42,9 +44,18 @@ const App = () => {
           />
           {/* Route for the new book form */}
           <Route
-            path="/new-book-form"
+            path="/add-book"
             element={user ? <NewBookForm /> : <Navigate to="/login" />}
           />
+          <Route
+            path="/genres"
+            element={user ? <Genres /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/add-genre"
+            element={user ? <NewGenreForm /> : <Navigate to="/login" />}
+          />
+
           {/* Redirect all unknown routes */}
           <Route 
             path="/logout" 

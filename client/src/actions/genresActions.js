@@ -3,7 +3,7 @@ import {
   FETCH_GENRES_SUCCESS,
   FETCH_GENRES_FAILURE,
   ADD_GENRE_REQUEST,
-  ADD_GENRE_SUCCESS,
+  ADD_GENRE,
   ADD_GENRE_FAILURE,
   UPDATE_GENRE_REQUEST,
   UPDATE_GENRE_SUCCESS,
@@ -33,9 +33,10 @@ export const addGenreRequest = () => ({
   type: ADD_GENRE_REQUEST,
 });
 
-export const addGenreSuccess = (genre) => ({
-  type: ADD_GENRE_SUCCESS,
-  payload: genre,
+// Action creators
+export const addGenreSuccess = (newGenre) => ({
+  type: ADD_GENRE,
+  payload: newGenre,
 });
 
 export const addGenreFailure = (error) => ({

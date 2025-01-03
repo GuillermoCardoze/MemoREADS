@@ -6,7 +6,6 @@ import { addBook } from '../thunks/booksThunks';
 import { addAuthor } from '../thunks/authorsThunks';
 import { addGenre } from '../thunks/genresThunks';
 import { useNavigate } from 'react-router-dom';
-import { updateUserBooks } from '../actions/usersActions';
 
 const NewBookForm = () => {
   const dispatch = useDispatch();
@@ -14,9 +13,15 @@ const NewBookForm = () => {
   const { loading, error } = useSelector((state) => state.books);
   const navigate = useNavigate();
 
+  // Extract authors and genres from user.books
+  const authors = [...new Set(user.books.map((book) => book.author))];
+  const genres = [...new Set(user.books.map((book) => book.genre))];
+
   const formik = useFormik({
     initialValues: {
       title: '',
+      authorId: '',
+      genreId: '',
       authorName: '',
       authorDescription: '',
       genreName: '',
@@ -24,20 +29,45 @@ const NewBookForm = () => {
     },
     validationSchema: Yup.object({
       title: Yup.string().required('Book title is required'),
-      authorName: Yup.string().required('Author name is required'),
-      authorDescription: Yup.string().required('Author description is required'),
-      genreName: Yup.string().required('Genre name is required'),
-      genreDescription: Yup.string().required('Genre description is required'),
+      authorId: Yup.string().required('Author is required'),
+      genreId: Yup.string().required('Genre is required'),
+      authorName: Yup.string().when('authorId', {
+        is: '',
+        then: Yup.string().required('Author name is required when creating a new author'),
+      }),
+      authorDescription: Yup.string().when('authorId', {
+        is: '',
+        then: Yup.string().required('Author description is required when creating a new author'),
+      }),
+      genreName: Yup.string().when('genreId', {
+        is: '',
+        then: Yup.string().required('Genre name is required when creating a new genre'),
+      }),
+      genreDescription: Yup.string().when('genreId', {
+        is: '',
+        then: Yup.string().required('Genre description is required when creating a new genre'),
+      }),
     }),
     onSubmit: async (values, { resetForm }) => {
       try {
-        const authorResponse = await dispatch(
-          addAuthor({ name: values.authorName, description: values.authorDescription })
-        );
+        let authorResponse;
+        let genreResponse;
 
-        const genreResponse = await dispatch(
-          addGenre({ name: values.genreName, description: values.genreDescription })
-        );
+        if (values.authorId) {
+          authorResponse = { id: values.authorId };
+        } else {
+          authorResponse = await dispatch(
+            addAuthor({ name: values.authorName, description: values.authorDescription })
+          );
+        }
+
+        if (values.genreId) {
+          genreResponse = { id: values.genreId };
+        } else {
+          genreResponse = await dispatch(
+            addGenre({ name: values.genreName, description: values.genreDescription })
+          );
+        }
 
         const bookData = {
           title: values.title,
@@ -46,24 +76,13 @@ const NewBookForm = () => {
           author_id: authorResponse.id,
           genre_id: genreResponse.id,
         };
-    
-        const bookResponse = await dispatch(addBook(bookData));
 
-        // Prepare the full book object with related details
-    const newBook = {
-      ...bookResponse, // Assume addBook returns the newly created book
-      author: { id: authorResponse.id, ...authorResponse },
-      genre: { id: genreResponse.id, ...genreResponse },
-    };
-
-        // Step 4: Dispatch addBook
-        // Dispatch action to update user state
-      dispatch(updateUserBooks(newBook));        
-      resetForm();
+        await dispatch(addBook(bookData)); // Dispatch addBook and update user session
+        resetForm();
+        navigate('/');
       } catch (err) {
         console.error('Error adding book:', err.message);
       }
-      navigate('/');
     },
   });
 
@@ -71,54 +90,63 @@ const NewBookForm = () => {
     <div>
       <h2>Add New Book</h2>
       <form onSubmit={formik.handleSubmit}>
-        {/* Book Title */}
         <label>Book Title:</label>
-        <input name="title" onChange={formik.handleChange} value={formik.values.title} />
+        <input
+          name="title"
+          onChange={formik.handleChange}
+          value={formik.values.title}
+        />
         {formik.errors.title && <div>{formik.errors.title}</div>}
+        <br />
 
-        {/* Author Name */}
-        <label>Author Name:</label>
-        <input
-          name="authorName"
+        <label>Author:</label>
+        <select
+          name="authorId"
           onChange={formik.handleChange}
-          value={formik.values.authorName}
-        />
-        {formik.errors.authorName && <div>{formik.errors.authorName}</div>}
+          value={formik.values.authorId}
+        >
+          <option value="">Select Author</option>
+          {authors &&
+            authors.map((author, index) => (
+              <option key={`${author.id}-${index}`} value={author.id}>
+                {author.name}
+              </option>
+            ))}
+        </select>
+        {formik.errors.authorId && <div>{formik.errors.authorId}</div>}
+        <br />
 
-        {/* Author Description */}
-        <label>Author Description:</label>
-        <input
-          name="authorDescription"
+        {!formik.values.authorId && (
+          <>
+          </>
+        )}
+
+        <label>Genre:</label>
+        <select
+          name="genreId"
           onChange={formik.handleChange}
-          value={formik.values.authorDescription}
-        />
-        {formik.errors.authorDescription && <div>{formik.errors.authorDescription}</div>}
+          value={formik.values.genreId}
+        >
+          <option value="">Select Genre</option>
+          {genres &&
+            genres.map((genre, index) => (
+              <option key={`${genre.id}-${index}`} value={genre.id}>
+                {genre.name}
+              </option>
+            ))}
+        </select>
+        {formik.errors.genreId && <div>{formik.errors.genreId}</div>}
+        <br />
 
-        {/* Genre Name */}
-        <label>Genre Name:</label>
-        <input
-          name="genreName"
-          onChange={formik.handleChange}
-          value={formik.values.genreName}
-        />
-        {formik.errors.genreName && <div>{formik.errors.genreName}</div>}
+        {!formik.values.genreId && (
+          <>
+          </>
+        )}
 
-        {/* Genre Description */}
-        <label>Genre Description:</label>
-        <input
-          name="genreDescription"
-          onChange={formik.handleChange}
-          value={formik.values.genreDescription}
-        />
-        {formik.errors.genreDescription && <div>{formik.errors.genreDescription}</div>}
-
-        {/* Submit Button */}
         <button type="submit" disabled={loading}>
           {loading ? 'Adding...' : 'Add Book'}
         </button>
       </form>
-
-      {/* Error Message */}
       {error && <div style={{ color: 'red' }}>Error: {error}</div>}
     </div>
   );

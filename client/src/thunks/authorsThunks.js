@@ -8,6 +8,7 @@ import {
   updateAuthorSuccess,
   deleteAuthorSuccess,
 } from "../actions/authorsActions";
+import { checkSession } from "./usersThunks";
 
 export const fetchAuthors = () => async (dispatch) => {
   dispatch(fetchAuthorsRequest());
@@ -24,18 +25,17 @@ export const fetchAuthors = () => async (dispatch) => {
 export const addAuthor = (authorData) => async (dispatch) => {
   dispatch(addAuthorRequest());
   try {
-    const response = await fetch("/authors", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/authors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(authorData),
     });
-    if (!response.ok) throw new Error("Failed to add author");
+    if (!response.ok) throw new Error('Failed to add author');
     const author = await response.json();
     dispatch(addAuthorSuccess(author));
-    return author;
+    dispatch(checkSession()); // Refresh session data
   } catch (error) {
     dispatch(addAuthorFailure(error.message));
-    throw error;
   }
 };
 

@@ -1,10 +1,10 @@
 import {
-  fetchGenresRequest,
-  fetchGenresSuccess,
-  fetchGenresFailure,
-  addGenreRequest,
+  // fetchGenresRequest,
+  // fetchGenresSuccess,
+  // fetchGenresFailure,
+  // addGenreRequest,
   addGenreSuccess,
-  addGenreFailure,
+  // addGenreFailure,
   updateGenreRequest,
   updateGenreSuccess,
   updateGenreFailure,
@@ -12,33 +12,44 @@ import {
   deleteGenreSuccess,
   deleteGenreFailure,
 } from "../actions/genresActions";
+// import { checkSession } from "./usersThunks";
 
+// Fetch genres
 export const fetchGenres = () => async (dispatch) => {
-  dispatch(fetchGenresRequest());
   try {
-    const response = await fetch("/genres");
-    const genres = await response.json();
-    dispatch(fetchGenresSuccess(genres));
+    const response = await fetch('/genres'); // Your API endpoint for genres
+    const data = await response.json();
+
+    // Make sure that 'data' is an array
+    dispatch({ type: 'SET_GENRES', payload: data }); // Store genres in Redux
   } catch (error) {
-    dispatch(fetchGenresFailure(error.message));
+    dispatch({ type: 'SET_ERROR', payload: error.message });
   }
 };
 
+// Add genre
 export const addGenre = (genreData) => async (dispatch) => {
-  dispatch(addGenreRequest());
   try {
-    const response = await fetch("/genres", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/genres', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(genreData),
     });
+    if (!response.ok) throw new Error('Failed to add genre');
     const newGenre = await response.json();
+
+    // Dispatch the action to add the genre to the Redux store
     dispatch(addGenreSuccess(newGenre));
-    return newGenre;
+
+    // Optionally, you could refetch genres here to keep the list fresh
+    dispatch(fetchGenres());  // This will re-fetch the genres list
+
   } catch (error) {
-    dispatch(addGenreFailure(error.message));
+    // Handle error (you can dispatch failure actions here)
+    console.error("Error adding genre:", error);
   }
 };
+
 
 export const updateGenre = (id, genreData) => async (dispatch) => {
   dispatch(updateGenreRequest());

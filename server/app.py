@@ -16,214 +16,247 @@ def not_found(error):
 
 class Books(Resource):
     def get(self):
-        books = [book.to_dict() for book in Book.query.all()]
-        if not books:
-            return make_response({'message': 'No books found'}, 200)
-        return make_response(books, 200)
+        if session.get('user_id'):
+            books = Book.query.all()
+            return [book.to_dict() for book in books],200
+
+        return {'error': '401 Unauthorized'}, 401
 
     def post(self):
-        if not request.is_json:
-            return make_response({'error': 'Request must be JSON'}, 400)
+        user_id = session.get('user_id')
+        if user_id:
 
-        try:
-            json = request.get_json()
+            request_json = request.get_json()
 
-            # Retrieve related entities
-            author_id = json.get('author_id')
-            genre_id = json.get('genre_id')
-            user_id = json.get('user_id')
+            title = request_json['title']
+            rating = request_json['rating']
+            author_id = request_json['author_id']
+            genre_id = request_json['genre_id']
 
-            if not author_id or not genre_id or not user_id:
-                return make_response({'error': 'Missing author_id, genre_id, or user_id'}, 400)
+            try:
+                book = Book(title=title,
+                            rating=rating,
+                            author_id=author_id,
+                            genre_id=genre_id, 
+                            user_id=user_id)
 
-            author = Author.query.get(author_id)
-            genre = Genre.query.get(genre_id)
-            user = User.query.get(user_id)
 
-            if not author:
-                return make_response({'error': 'Author not found'}, 404)
-            if not genre:
-                return make_response({'error': 'Genre not found'}, 404)
-            if not user:
-                return make_response({'error': 'User not found'}, 404)
+                db.session.add(book)
+                db.session.commit()
+                return book.to_dict(),201
+        
+            except IntegrityError:
 
-            # Create the book
-            book = Book(
-                title=json['title'],
-                rating=json['rating'],
-                author=author,
-                genre=genre,
-                user=user
-            )
+                return{'error': '422 Unprocessable Entity'}, 422
+        return {'error': '401 Unauthorized'}, 401
 
-            db.session.add(book)
-            db.session.commit()
 
-            return make_response(jsonify(book.to_dict()), 201)
-
-        except KeyError as e:
-            return make_response({'error': f'Missing key: {str(e)}'}, 400)
-        except Exception as e:
-            db.session.rollback()  # Rollback session on error
-            return make_response({'error': 'Failed to create book', 'message': str(e)}, 500)
 
 api.add_resource(Books, '/books')
 
 class BooksById(Resource):
     def get(self, id):
-        books = Book.query.filter(Book.id==id).first()
+        if session.get('user_id'):
+            books = Book.query.filter(Book.id==id).first()
+            return [book.to_dict() for book in books],200
 
-        if not books:
-            abort(404, "The book was not found.")
-
-        return books.to_dict(),200
+        return {'error': '401 Unauthorized'}, 401
     
     def patch(self, id):
-        books = Book.query.filter(Book.id==id).first()
+        user_id = session.get('user_id')
+        if user_id:
 
-        if not books:
-            abort(404, "The book was not found.")
+            request_json = request.get_json()
 
-        data = request.get_json()
+            title = request_json['title']
+            rating = request_json['rating']
 
-        for key in data:
-            setattr(books, key, data[key])
+            try:
+                book = Book.query.filter(Book.id==id).first()
+                if book.user_id == session.get('user_id'):
+                    book.title = title
+                    book.rating = rating
+                    
+                    db.session.add(book)
+                    db.session.commit()
 
-        db.session.add(books)
-        db.session.commit()
-        return books.to_dict(),202 
+                    response_dict = book.to_dict()
+                    response = make_response(response_dict,202)
+                    return response
+            except IntegrityError:
+                return {'error': '422 Unprocessable Entity'}, 422
+
+        return {'error': '401 Unauthorized'}, 401
+
 
     def delete(self,id):
-        book = Book.query.filter(Book.id==id).first()
+        if session.get('user_id'):
 
-        if not book:
-            abort(404, "The book was not found.")
+            book = Books.query.filter_by(id=id).first()
+            if book.user_id == session.get('user_id'):
+                db.session.delete(book)
+                db.session.commit()
 
-        db.session.delete(book)
-        db.session.commit()
-
-        return {},204
+                response_dict = {"message": "item successfully deleted"}
+                response = make_response(response_dict,204)
+                return response
+        return {'error': '401 Unauthorized'}, 401
     
 api.add_resource(BooksById, '/books/<int:id>')
 
 
 class Authors(Resource):
     def get(self):
-        authors = [author.to_dict() for author in Author.query.all()]
-        return make_response(authors,200)
+        if session.get('user_id'):
+            authors = Author.query.all()
+            return [author.to_dict() for author in authors],200
+        return {'error': '401 Unauthorized'}, 401
+        
     
     def post(self):
-        json = request.get_json()
-        try:
-            new_author = Author(
-                name = json['name'],
-                description = json['description']
-            )
-            db.session.add(new_author)
-            db.session.commit()
-            return make_response(new_author.to_dict(), 201)
-        
-        except ValueError as e:
-            return {'errors': str(e)}, 400
-        except Exception as e:
-            return {'errors': "Failed to add author to database", 'message': str(e)},500
+        if session.get('user_id'):
+            request_json = request.get_json()
+            name = request_json['name']
+            description = request_json['description']
+
+            try:
+                author = Author(name=name, description=description)
+
+                db.session.add(author)
+                db.session.commit()
+
+                return author.to_dict(), 201
+
+            except IntegrityError:
+                return {'error': '422 Unprocessable Entity'}, 422
+
+        return {'error': '401 Unauthorized'}, 401
+
+
 
 api.add_resource(Authors, "/authors")
 
 class AuthorsById(Resource):
     def get(self, id):
-        authors = Author.query.filter(Author.id==id).first()
-        return make_response(authors.to_dict(),200)
+        if session.get('user_id'):
+            authors = Author.query.filter(Author.id==id).first()
+            return [author.to_dict() for author in authors],200
+
+        return {'error': '401 Unauthorized'}, 401
+
 
     def patch(self, id):
-        json = request.get_json()
-        author = Author.query.filter(Author.id==id).first()
+        user_id = session.get('user_id')
+        if user_id:
+            request_json = request.get_json()
 
-        if author:
-            if not json.get('name') or not json.get('description'):
-                return make_response({'error': "All fields (name, description) are required"},400)
+            name= request_json['name']
+            description= request_json['description']
 
             try:
-                author.name = json['name']
-                author.description = json['description']
+                author = Author.query.filter(Author.id == id).first()
+                if author.user_id == session.get('user_id'):
+                    author.name= name
+                    author.description= description
 
-                db.session.commit()
-                return make_response(author.to_dict(), 202)
-            except Exception as e:
-                return make_response({'errors': "Failed to update author", "message": str(e)},400)
-        else:
-            return make_response({'error': "Author not found"},404)
+                    db.session.add(author)
+                    db.session.commit()
+
+                    response_dict = author.to_dict()
+                    response = make_response(response_dict,202)
+                    return response
+            except IntegrityError:
+                return {'error': '422 Unprocessable Entity'}, 422
+
+        return {'error': '401 Unauthorized'}, 401
         
     def delete(self,id):
-        author = Author.query.filter(Author.id==id).first()
+        if session.get('user_id'):
+            author = Author.query.filter_by(id=id).first()
+            if author.user_id == session.get('user_id'):
+                db.session.delete(author)
+                db.session.commit()
 
-        if not author :
-            abort(404, "thr author was not found.")
+                response_dict = {"message": "author successfully deleted"}
+                response = make_response(response_dict,204)
+                return response
+            return {'error': '401 Unauthorized'}, 401
 
-        db.session.delete(author)
-        db.session.commit()
-
-        return {},204
 
 
 api.add_resource(AuthorsById, "/authors/<int:id>")
 
 class Genres(Resource):
     def get(self):
-        genres = [genre.to_dict() for genre in Genre.query.all()]
-        return make_response(genres,200)
+        if session.get('user_id'):
+            genres = Genre.query.all()
+            return [genre.to_dict() for genre in genres],200
+        return {'error': '401 Unauthorized'}, 401
     
     def post(self):
-        try:
-            json = request.get_json()
-            new_genre = Genre(
-                name = json['name'],
-                description = json['description']
-            )
-            db.session.add(new_genre)
-            db.session.commit()
-            return make_response(new_genre.to_dict(), 201)
-        except ValueError as e:
-            return {'errors': str(e)}, 400
-        except Exception as e:
-            return {'errors': "Failed to add genre to database", 'message': str(e)},500
+        if session.get('user_id'):
+            request_json = request.get_json()
+            name = request_json['name']
+            description = request_json['description']
+
+            try:
+                genre = Genre(name=name, description=description)
+
+                db.session.add(genre)
+                db.session.commit()
+
+                return genre.to_dict(), 201
+            except IntegrityError:
+                return {'error': '422 Unprocessable Entity'}, 422
+
+        return {'error': '401 Unauthorized'}, 401
 
 api.add_resource(Genres, "/genres")
 
 class GenresById(Resource):
     def get(self, id):
-        genres = Genre.query.filter(Genre.id==id).first()
-        return make_response(genres.to_dict(),200)
+        if session.get('user_id'):
+            genres = Genre.query.filter(Genre.id==id).first()
+            return [genre.to_dict() for genre in genres],200
+
+        return {'error': '401 Unauthorized'}, 401
     
     def patch(self, id):
-        json = request.get_json()
-        genre = Genre.query.filter(Genre.id==id).first()
-
-        if genre:
-            if not json.get('name') or not json.get('description'):
-                return make_response({'error': "All fields (name, description) are required"},400)
+        user_id = session.get('user_id')
+        if user_id:
+            request_json = request.get_json()
+            name = request_json['name']
+            description = request_json['description']
 
             try:
-                genre.name = json['name']
-                genre.description = json['description']
+                genre = Genre.query.filter(Genre.id == id).first()
+                if genre.user_id == session.get('user_id'):
+                    genre.name = name
+                    genre.description = description
 
-                db.session.commit()
-                return make_response(genre.to_dict(), 202)
-            except Exception as e:
-                return make_response({'errors': "Failed to update genre", "message": str(e)},400)
-        else:
-            return make_response({'error': "Genre not found"},404)
+                    db.session.add(genre)
+                    db.session.commit()
+                    response_dict = genre.to_dict()
+                    response = make_response(response_dict,200)
+                    return response
+            except IntegrityError:
+                return {'error': '422 Unprocessable Entity'}, 422
+
+        return {'error': '401 Unauthorized'}, 401
+
         
     def delete(self,id):
-        genre = Genre.query.filter(Genre.id==id).first()
+        if session.get('user_id'):
+            genre = Genre.query.filter_by(id=id).first()
+            if genre.user_id == session.get('user_id'):
+                db.session.delete(genre)
+                db.session.commit()
 
-        if not genre:
-            abort(404, "thr genre was not found.")
+                response_dict = {"message": "genre successfully deleted"}
 
-        db.session.delete(genre)
-        db.session.commit()
-
-        return {},204
+                response = make_response(response_dict,204)
+                return response
+            return {'error': '401 Unauthorized'},401
 
 
 api.add_resource(GenresById, "/genres/<int:id>")
@@ -268,15 +301,38 @@ api.add_resource(Logout, '/logout')
 
 class CheckSession(Resource):
     def get(self):
-        user_id = session["user_id"]
+        user_id = session.get("user_id")
+        if not user_id:
+            return {}, 401
 
-        if user_id:
-            user = User.query.filter(User.id==user_id).first()
-            return user.to_dict(),200
-        return {},401
+        # Retrieve the user
+        user = User.query.filter_by(id=user_id).first()
+        if not user:
+            return {}, 404
+
+        # Structure response to include books with nested data
+        user_dict = user.to_dict()
+        user_dict['books'] = [
+            {
+                "id": book.id,
+                "title": book.title,
+                "rating": book.rating,
+                "author": {
+                    "id": book.author.id,
+                    "name": book.author.name,
+                    "description": book.author.description,
+                },
+                "genre": {
+                    "id": book.genre.id,
+                    "name": book.genre.name,
+                    "description": book.genre.description,
+                },
+            }
+            for book in user.books
+        ]
+        return user_dict, 200
     
 api.add_resource(CheckSession, '/check_session')
-
 
 @app.before_request
 def check_session():
