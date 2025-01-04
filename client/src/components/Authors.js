@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 
-const Genres = () => {
+const Authors = () => {
   const { user } = useSelector(state => state.users); // access the users state
 
   if (!user) {
@@ -10,14 +10,14 @@ const Genres = () => {
   return (
     <div>
       <h2>Welcome, {user.username}</h2>
-      <p>Genres:</p>
+      <p>Authors:</p>
       <ul>
         {user.books && user.books.map(book => (
-          <li key={book.genre.id}>{book.genre.name} - Description: {book.genre.description}</li>
+          <li key={book.author.id}>{book.author.name} - Description: {book.author.description}</li>
         ))}
       </ul>
     </div>
   );
 };
 
-export default Genres;
+export default Authors;

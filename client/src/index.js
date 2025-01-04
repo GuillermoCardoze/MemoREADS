@@ -12,10 +12,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
-import configureAppStore from './store/configureStore';
+import store from './store/store';
 import App from './components/App';
 
-const store = configureAppStore();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

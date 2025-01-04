@@ -1,21 +1,20 @@
-import React from 'react';
+// NavBar.js
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Logout from './Logout';
 
-const NavBar = ({ user }) => {
+const NavBar = () => {
   const navigate = useNavigate();
-  // const [showLogin, setShowLogin] = useState(false);
-  // const [showSignUp, setShowSignUp] = useState(false);
-  
+  const user = useSelector((state) => state.users.user); // Get user from Redux store
 
   return (
     <nav>
-      <h1>MemoREADS App</h1>
-      {user ? (
-        <div>
-          <h1>Welcome, {user.username}</h1>
-          <button onClick={() => navigate('/add-book')}>Add Book</button>
-          <button onClick={() => navigate(`/${user.username}/books-list`)}>My Books</button>
+      <ul>
+        {/* Render different links based on whether the user is logged in */}
+        {user ? (
+          <div>
+          <button onClick={() => navigate('/books')}>My Book</button>
+          <button onClick={() => navigate('/authors')}>My Authors</button>
           <button onClick={() => navigate('/genres')}>My Genres</button>
           {/* <button onClick={() => navigate('/login')}>Logout</button> */}
           <Logout />
@@ -24,8 +23,8 @@ const NavBar = ({ user }) => {
         <div>
           <button onClick={() => navigate('/login')}>Login</button>
           <button onClick={() => navigate('/signup')}>Sign Up</button>
-        </div>
-      )}
+        </div>        )}
+      </ul>
     </nav>
   );
 };
