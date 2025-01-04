@@ -17,9 +17,9 @@ def not_found(error):
 class Books(Resource):
     def get(self):
         if session.get('user_id'):
-            books = Book.query.all()
-            return [book.to_dict() for book in books],200
-
+            # Filter books by the current logged-in user
+            books = Book.query.filter_by(user_id=session['user_id']).all()
+            return [book.to_dict() for book in books], 200
         return {'error': '401 Unauthorized'}, 401
 
     def post(self):
@@ -108,10 +108,16 @@ api.add_resource(BooksById, '/books/<int:id>')
 class Authors(Resource):
     def get(self):
         if session.get('user_id'):
-            authors = Author.query.all()
-            return [author.to_dict() for author in authors],200
+            # Fetch authors linked to the user's books
+            authors = (
+                db.session.query(Author)
+                .join(Book)
+                .filter(Book.user_id == session['user_id'])
+                .distinct()
+                .all()
+            )
+            return [author.to_dict() for author in authors], 200
         return {'error': '401 Unauthorized'}, 401
-        
     
     def post(self):
         if session.get('user_id'):
@@ -189,28 +195,39 @@ api.add_resource(AuthorsById, "/authors/<int:id>")
 class Genres(Resource):
     def get(self):
         if session.get('user_id'):
-            genres = Genre.query.all()
-            return [genre.to_dict() for genre in genres],200
+            # Fetch genres associated with books owned by the current user
+            genres = (
+                db.session.query(Genre)
+                .join(Book, Genre.id == Book.genre_id)  # Assuming Book has a genre_id FK
+                .filter(Book.user_id == session['user_id'])  # Filter by the logged-in user's books
+                .distinct()  # Ensure unique genres are returned
+                .all()
+            )
+            return [genre.to_dict() for genre in genres], 200
+
         return {'error': '401 Unauthorized'}, 401
     
     def post(self):
-        if session.get('user_id'):
-            request_json = request.get_json()
-            name = request_json['name']
-            description = request_json['description']
+        # Check if the user is logged in (session contains user_id)
+        if not session.get('user_id'):
+            return {'error': '401 Unauthorized'}, 401
 
-            try:
-                genre = Genre(name=name, description=description)
+        # Assuming genre data is coming in the request body
+        data = request.get_json()
 
-                db.session.add(genre)
-                db.session.commit()
+        # Create a new genre from the provided data
+        new_genre = Genre(
+            name=data.get('name'),
+            description=data.get('description')
+        )
 
-                return genre.to_dict(), 201
-            except IntegrityError:
-                return {'error': '422 Unprocessable Entity'}, 422
+        # Add the genre to the session and commit
+        db.session.add(new_genre)
+        db.session.commit()
 
-        return {'error': '401 Unauthorized'}, 401
 
+        return new_genre.to_dict(), 201
+        
 api.add_resource(Genres, "/genres")
 
 class GenresById(Resource):
@@ -284,8 +301,10 @@ class Signin(Resource):
         password = form_json["password"]
         user = User.query.filter_by(username=username).first()
         if user and user.authenticate(password):
-            session["user_id"] = user.id
-            return make_response(user.to_dict(), 200)
+            session['user_id'] = user.id
+            print(session['user_id'])
+            return {'id': user.id, 'username': user.username}, 200
+            # return make_response(user.to_dict(), 200)
         else:
             return make_response("Invalid Credentials", 401)
         
@@ -334,14 +353,14 @@ class CheckSession(Resource):
     
 api.add_resource(CheckSession, '/check_session')
 
-@app.before_request
-def check_session():
-    print(session)
-    if session.get("user_id") is None:
-        session["user_id"] = None
-    else:
-        print("User is logged in")
-        print(session["user_id"])        
+# @app.before_request
+# def check_session():
+#     print(session)
+#     if session.get("user_id") is None:
+#         session["user_id"] = None
+#     else:
+#         print("User is logged in")
+#         print(session["user_id"])        
 
 
 if __name__ == '__main__':

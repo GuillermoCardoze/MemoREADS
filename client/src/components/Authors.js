@@ -1,21 +1,35 @@
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAuthors } from '../slices/userSlice';
+// import { fetchAuthors } from './userSlice';  // Import your async thunk to fetch authors
 
 const Authors = () => {
-  const { user } = useSelector(state => state.users); // access the users state
+  const dispatch = useDispatch();
+  
+  // Access authors state from Redux
+  const { authors, loading, error } = useSelector((state) => state.users);
 
-  if (!user) {
-    return <p>No user is logged in</p>; // Display a message if there's no user
-  }
+  // Fetch authors data on component mount
+  useEffect(() => {
+    dispatch(fetchAuthors());
+  }, [dispatch]);
+
+  // Loading and error handling
+  if (loading) return <div>Loading authors...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
-      <h2>Welcome, {user.username}</h2>
-      <p>Authors:</p>
-      <ul>
-        {user.books && user.books.map(book => (
-          <li key={book.author.id}>{book.author.name} - Description: {book.author.description}</li>
-        ))}
-      </ul>
+      <h3>Authors</h3>
+      {authors.length === 0 ? (
+        <p>No authors available.</p>
+      ) : (
+        <ul>
+          {authors.map((author) => (
+            <li key={author.id}>{author.name}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

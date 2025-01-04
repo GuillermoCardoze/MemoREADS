@@ -10,10 +10,13 @@ import Display from './Display';
 import Genres from './Genres';
 import Authors from './Authors';
 import NavBar from './NavBar';
+import NewGenreForm from './NewGenreForm';
+import NewBookForm from './NewBookForm';
 
 
 function App() {
   const dispatch = useDispatch();
+  
 
   // Dispatch checkSession on app load
   useEffect(() => {
@@ -23,9 +26,12 @@ function App() {
   return (
     <Router>
       <NavBar /> 
+      <h1>MemoREADS</h1>
       <Routes>
         <Route path="/books" element={<Display />} /> 
+        <Route path="/add-book" element={<NewBookForm />} />
         <Route path="/genres" element={<Genres />} /> 
+        <Route path="/add-genre" element={<NewGenreForm />} />
         <Route path="/authors" element={<Authors />} /> 
         <Route path="/login" element={<LoginForm />} /> 
         <Route path="/signup" element={<SignupForm />} /> 

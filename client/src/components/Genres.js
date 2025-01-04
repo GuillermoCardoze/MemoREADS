@@ -1,19 +1,30 @@
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchGenres } from '../slices/userSlice'; // Redux action to fetch genres
+import { useNavigate } from 'react-router-dom';
 
 const Genres = () => {
-  const { user } = useSelector(state => state.users); // access the users state
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { genres, loading, error } = useSelector((state) => state.users); // Access genres from Redux store
+  
+  
+  // Fetch genres when the component is mounted
+  useEffect(() => {
+    dispatch(fetchGenres());
+  }, [dispatch]);
 
-  if (!user) {
-    return <p>No user is logged in</p>; // Display a message if there's no user
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
-      <h2>Welcome, {user.username}</h2>
-      <p>Genres:</p>
+      <h2>Genres List</h2>
+      <button onClick={() => navigate('/add-genre')}>Add New Genre</button>
+
       <ul>
-        {user.books && user.books.map(book => (
-          <li key={book.genre.id}>{book.genre.name} - Description: {book.genre.description}</li>
+        {genres.map((genre) => (
+          <li key={genre.id}>{genre.name}: {genre.description}</li>
         ))}
       </ul>
     </div>

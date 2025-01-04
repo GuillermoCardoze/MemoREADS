@@ -120,8 +120,13 @@ class User(db.Model, SerializerMixin):
     # Relationship to Book
     books = db.relationship('Book', back_populates='user', cascade='all, delete-orphan')
 
+     # Association proxies for Author and Genre via Book
+    authors = association_proxy('books', 'author', creator=lambda author: Book(author=author))
+    genres = association_proxy('books', 'genre', creator=lambda genre: Book(genre=genre))
+
     # Serialization rules
-    serialize_rules = ('-books.user', '-password_hash', 'books.author', 'books.genre')   
+    serialize_rules = ('-books.user', '-password_hash', 'books.author', 'books.genre', 'authors', 'genres')
+   
 
     @validates("username")
     def validate_username(self, key, username):
@@ -142,27 +147,5 @@ class User(db.Model, SerializerMixin):
     def authenticate(self,password):
         return flask_bcrypt.check_password_hash(self._password_hash, password.encode("utf-8"))
 
-
-
-
-
-
-
-    # @hybrid_property
-    # def password(self):
-    #     raise AttributeError('Passwords are private, set-only')
-
-    # @password.setter
-    # def password(self, password_to_validate):
-    #     if not isinstance(password_to_validate, str):
-    #         raise TypeError('Password must be a string')
-    #     if len(password_to_validate) < 8:
-    #         raise ValueError('Password must be at least 8 characters long')
-    #     hashed_password = flask_bcrypt.generate_password_hash(password_to_validate).decode("utf-8")
-    #     self._password_hash = hashed_password
-
-    # def authenticate(self, password_to_check):
-    #     return flask_bcrypt.check_password_hash(self._password_hash, password_to_check)
-
-    # def __repr__(self):
-    #     return f'User #{self.id}: {self.username}'
+    def __repr__(self):
+        return f'User #{self.id}: {self.username}'
