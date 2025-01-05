@@ -24,6 +24,15 @@ class Book(db.Model, SerializerMixin):
     # Serialization rules
     serialize_rules = ('-author.books', '-genre.books', '-user.books', 'author', 'genre')   
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'rating': self.rating,
+            'author': self.author.to_dict() if self.author else None,
+            'genre': self.genre.to_dict() if self.genre else None,
+        }
+
     @validates('title')
     def validate_title(self, key, title):
         if not title or not isinstance(title, str):
@@ -126,6 +135,15 @@ class User(db.Model, SerializerMixin):
 
     # Serialization rules
     serialize_rules = ('-books.user', '-password_hash', 'books.author', 'books.genre', 'authors', 'genres')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'books': [book.to_dict() for book in self.books],  # Serialize books
+            'authors': [author.to_dict() for author in self.authors],  # Serialize authors
+            'genres': [genre.to_dict() for genre in self.genres],  # Serialize genres
+        }
    
 
     @validates("username")

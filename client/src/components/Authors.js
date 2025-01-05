@@ -1,35 +1,35 @@
+// Authors.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAuthors } from '../slices/userSlice';
-// import { fetchAuthors } from './userSlice';  // Import your async thunk to fetch authors
+import { fetchAuthors, deleteAuthor } from '../slices/userSlice'; // Import the necessary actions
+import NewAuthorForm from './NewAuthorForm';
 
 const Authors = () => {
   const dispatch = useDispatch();
-  
-  // Access authors state from Redux
-  const { authors, loading, error } = useSelector((state) => state.users);
+  const { authors, loading, error } = useSelector((state) => state.users); // Access authors from state
 
-  // Fetch authors data on component mount
   useEffect(() => {
-    dispatch(fetchAuthors());
+    dispatch(fetchAuthors()); // Fetch authors when component mounts
   }, [dispatch]);
 
-  // Loading and error handling
-  if (loading) return <div>Loading authors...</div>;
-  if (error) return <div>Error: {error}</div>;
+  const handleDelete = (id) => {
+    dispatch(deleteAuthor(id)); // Handle delete action
+  };
 
   return (
     <div>
-      <h3>Authors</h3>
-      {authors.length === 0 ? (
-        <p>No authors available.</p>
-      ) : (
-        <ul>
-          {authors.map((author) => (
-            <li key={author.id}>{author.name}</li>
-          ))}
-        </ul>
-      )}
+      <h1>Authors</h1>
+      <NewAuthorForm />
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error}</p>}
+      <ul>
+        {authors.map((author) => (
+          <li key={author.id}>
+            <span>{author.name}</span>
+            <button onClick={() => handleDelete(author.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

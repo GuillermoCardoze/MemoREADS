@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginForm from './LoginForm'; // Login form
 import SignupForm from './SignupForm'; // Signup form
 import Logout from './Logout'; // Logout component
-import Display from './Display';
+import Books from './Books';
 import Genres from './Genres';
 import Authors from './Authors';
 import NavBar from './NavBar';
@@ -28,7 +28,7 @@ function App() {
       <NavBar /> 
       <h1>MemoREADS</h1>
       <Routes>
-        <Route path="/books" element={<Display />} /> 
+        <Route path="/books" element={<Books />} /> 
         <Route path="/add-book" element={<NewBookForm />} />
         <Route path="/genres" element={<Genres />} /> 
         <Route path="/add-genre" element={<NewGenreForm />} />

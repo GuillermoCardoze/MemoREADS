@@ -107,37 +107,48 @@ api.add_resource(BooksById, '/books/<int:id>')
 
 class Authors(Resource):
     def get(self):
-        if session.get('user_id'):
-            # Fetch authors linked to the user's books
-            authors = (
-                db.session.query(Author)
-                .join(Book)
-                .filter(Book.user_id == session['user_id'])
-                .distinct()
-                .all()
-            )
-            return [author.to_dict() for author in authors], 200
-        return {'error': '401 Unauthorized'}, 401
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'error': '401 Unauthorized'}, 401
+
+        # Fetch the user
+        user = User.query.get(user_id)
+        if not user:
+            return {'error': '404 Not Found'}, 404
+
+        # Use the association proxy to get authors
+        authors = user.authors  # Association proxy automatically retrieves distinct authors
+
+        # Serialize and return the authors
+        return [author.to_dict() for author in authors], 200
     
     def post(self):
-        if session.get('user_id'):
-            request_json = request.get_json()
-            name = request_json['name']
-            description = request_json['description']
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'error': 'Unauthorized'}, 401
 
-            try:
-                author = Author(name=name, description=description)
+        # Get the author data from the request
+        request_json = request.get_json()
+        name = request_json.get('name')
+        description = request_json.get('description')
 
-                db.session.add(author)
-                db.session.commit()
+        if not name or not description:
+            return {'error': 'Name and description are required'}, 400
 
-                return author.to_dict(), 201
+        # Create and save the new author
+        try:
+            # Instead of passing user_id directly, you create the author normally
+            author = Author(name=name, description=description)
+            # Associate the author with the logged-in user
+            author.user = User.query.get(user_id)  # Associate the current user with the author
 
-            except IntegrityError:
-                return {'error': '422 Unprocessable Entity'}, 422
+            db.session.add(author)
+            db.session.commit()
 
-        return {'error': '401 Unauthorized'}, 401
+            return author.to_dict(), 201
 
+        except IntegrityError:
+            return {'error': 'Unable to create author'}, 500
 
 
 api.add_resource(Authors, "/authors")
@@ -196,13 +207,8 @@ class Genres(Resource):
     def get(self):
         if session.get('user_id'):
             # Fetch genres associated with books owned by the current user
-            genres = (
-                db.session.query(Genre)
-                .join(Book, Genre.id == Book.genre_id)  # Assuming Book has a genre_id FK
-                .filter(Book.user_id == session['user_id'])  # Filter by the logged-in user's books
-                .distinct()  # Ensure unique genres are returned
-                .all()
-            )
+            genres = Genre.query.join(Book).filter(Book.user_id == session['user_id']).all()
+
             return [genre.to_dict() for genre in genres], 200
 
         return {'error': '401 Unauthorized'}, 401

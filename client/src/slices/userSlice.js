@@ -171,6 +171,7 @@ export const postGenre = createAsyncThunk('users/postGenre', async (genreData, {
       if (!response.ok) throw new Error('Failed to post genre');
       
       const data = await response.json();
+      console.log("Posted Genre:", data);
       return data; // Return the genre data to be used in the reducer
     } catch (error) {
       return rejectWithValue(error.message); // Return error message
@@ -257,7 +258,7 @@ const userSlice = createSlice({
       .addCase(fetchAuthors.fulfilled, (state, action) => { state.loading = false; state.authors = action.payload; })
       .addCase(fetchAuthors.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(postAuthor.pending, (state) => { state.loading = true; })
-      .addCase(postAuthor.fulfilled, (state, action) => { state.loading = false; state.authors.push(action.payload); })
+      .addCase(postAuthor.fulfilled, (state, action) => { state.loading = false; state.authors = [...state.authors, action.payload]; })
       .addCase(postAuthor.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(updateAuthor.pending, (state) => { state.loading = true; })
       .addCase(updateAuthor.fulfilled, (state, action) => { state.loading = false; state.authors = state.authors.map((author) => author.id === action.payload.id ? action.payload : author); })
@@ -271,7 +272,7 @@ const userSlice = createSlice({
       .addCase(fetchGenres.fulfilled, (state, action) => { state.loading = false; state.genres = action.payload; })
       .addCase(fetchGenres.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(postGenre.pending, (state) => { state.loading = true; })
-      .addCase(postGenre.fulfilled, (state, action) => {console.log('New Genre:', action.payload); state.loading = false; state.genres.push(action.payload); })
+      .addCase(postGenre.fulfilled, (state, action) => {console.log('New Genre:', action.payload); state.loading = false; state.genres = [...state.genres, action.payload]; })
       .addCase(postGenre.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(updateGenre.pending, (state) => { state.loading = true; })
       .addCase(updateGenre.fulfilled, (state, action) => { state.loading = false; state.genres = state.genres.map((genre) => genre.id === action.payload.id ? action.payload : genre); })

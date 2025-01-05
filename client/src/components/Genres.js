@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGenres } from '../slices/userSlice'; // Redux action to fetch genres
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
+import NewGenreForm from './NewGenreForm'; // Import the form
 
 const Genres = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { genres, loading, error } = useSelector((state) => state.users); // Access genres from Redux store
-  
   
   // Fetch genres when the component is mounted
   useEffect(() => {
@@ -17,10 +17,14 @@ const Genres = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
+  console.log(genres)
+
   return (
     <div>
       <h2>Genres List</h2>
-      <button onClick={() => navigate('/add-genre')}>Add New Genre</button>
+      
+      {/* NewGenreForm will be displayed below the genres list */}
+      <NewGenreForm />
 
       <ul>
         {genres.map((genre) => (
