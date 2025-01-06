@@ -12,6 +12,7 @@ import Authors from './Authors';
 import NavBar from './NavBar';
 import NewGenreForm from './NewGenreForm';
 import NewBookForm from './NewBookForm';
+import Ratings from './Ratings';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
       <Routes>
         <Route path="/books" element={<Books />} /> 
         <Route path="/add-book" element={<NewBookForm />} />
+        <Route path="/ratings/:bookId" element={<Ratings />} />
         <Route path="/genres" element={<Genres />} /> 
         <Route path="/add-genre" element={<NewGenreForm />} />
         <Route path="/authors" element={<Authors />} /> 

@@ -1,8 +1,8 @@
-// Books.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBooks, deleteBook } from '../slices/userSlice';
 import NewBookForm from './NewBookForm'; // Import NewBookForm component
+import { Link } from 'react-router-dom'; // Import Link for navigation
 
 const Books = () => {
   const dispatch = useDispatch();
@@ -24,6 +24,7 @@ const Books = () => {
       
       {/* New Book Form */}
       <NewBookForm />
+      
       {/* Display books */}
       <div>
         {books.length === 0 ? (
@@ -32,18 +33,25 @@ const Books = () => {
           books.map((book) => (
             <div key={book.id}>
               <h3>{book.title}</h3>
-              <p>Rating: {book.rating === 0 ? 'Not Rated' : book.rating}</p> {/* Display "Not Rated" if rating is 0 */}              <p>Author: {book.author?.name}</p> {/* Display author's name */}
-              <p>Author Description: {book.author?.description}</p> {/* Author description */}
+              <p>Rating: {book.rating === 0 ? 'Not Rated' : book.rating}</p> {/* Display "Not Rated" if rating is 0 */}
+              
+              {/* Button to update rating */}
+              <Link to={`/ratings/${book.id}`}>
+                <button>Update Rating</button>
+              </Link>
+
+              <p>Author: {book.author?.name}</p> {/* Display author's name */}
+              {/* <p>Author Description: {book.author?.description}</p> Author description */}
               <p>Genre: {book.genre?.name}</p> {/* Display genre name */}
-              <p>Genre Description: {book.genre?.description}</p> {/* Genre description */}
+              {/* <p>Genre Description: {book.genre?.description}</p> Genre description */}
+              
+              
               {/* Delete button */}
               <button onClick={() => handleDelete(book.id)}>Delete</button>
             </div>
           ))
         )}
       </div>
-
-      
     </div>
   );
 };

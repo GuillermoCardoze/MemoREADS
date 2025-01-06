@@ -31,6 +31,7 @@ const Authors = () => {
                 <br></br>
                 Author Description: {author.name}
                 <br></br>
+                <br></br>
             </span>
             {/* <button onClick={() => handleDelete(author.id)}>Delete</button> */}
           </li>
