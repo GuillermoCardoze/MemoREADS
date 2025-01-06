@@ -86,17 +86,21 @@ class BooksById(Resource):
 
 
     def delete(self,id):
-        if session.get('user_id'):
+        if not session.get('user_id'):
+            return {'error': '401 Unauthorized'}, 401
 
-            book = Books.query.filter_by(id=id).first()
-            if book.user_id == session.get('user_id'):
-                db.session.delete(book)
-                db.session.commit()
+        book = Book.query.filter_by(id=id).first()
+        if not book:
+            return {'error': '404 Not Found'}, 404
 
-                response_dict = {"message": "item successfully deleted"}
-                response = make_response(response_dict,204)
-                return response
-        return {'error': '401 Unauthorized'}, 401
+        if book.user_id != session.get('user_id'):
+            return {'error': '403 Forbidden'}, 403
+
+        db.session.delete(book)
+        db.session.commit()
+
+        return {"message": "Item successfully deleted"}, 204
+
     
 api.add_resource(BooksById, '/books/<int:id>')
 

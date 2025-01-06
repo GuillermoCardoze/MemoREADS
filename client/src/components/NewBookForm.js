@@ -36,7 +36,7 @@ const NewBookForm = () => {
   const formik = useFormik({
     initialValues: {
       title: '',
-      rating: '',
+      // rating: '',
       authorId: '',
       genreId: '',
     },
@@ -44,7 +44,8 @@ const NewBookForm = () => {
       // Construct bookData using the form values
       const bookData = {
         title: values.title,
-        rating: values.rating,
+        rating: 0,
+        // rating: values.rating,
         author_id: values.authorId,
         genre_id: values.genreId,
       };
@@ -71,7 +72,7 @@ const NewBookForm = () => {
             required
           />
         </div>
-        <div>
+        {/* <div>
           <label>Rating:</label>
           <input
             type="number"
@@ -80,7 +81,7 @@ const NewBookForm = () => {
             onChange={formik.handleChange}
             required
           />
-        </div>
+        </div> */}
         <div>
           <label>Author:</label>
           <select

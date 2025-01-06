@@ -1,7 +1,7 @@
 // Books.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBooks } from '../slices/userSlice';
+import { fetchBooks, deleteBook } from '../slices/userSlice';
 import NewBookForm from './NewBookForm'; // Import NewBookForm component
 
 const Books = () => {
@@ -11,6 +11,10 @@ const Books = () => {
   useEffect(() => {
     dispatch(fetchBooks()); // Dispatch fetchBooks action on component mount
   }, [dispatch]);
+
+  const handleDelete = (id) => {
+    dispatch(deleteBook(id)); // Dispatch deleteBook action with the book ID
+  };
 
   return (
     <div>
@@ -28,11 +32,12 @@ const Books = () => {
           books.map((book) => (
             <div key={book.id}>
               <h3>{book.title}</h3>
-              <p>Rating: {book.rating}</p>
-              <p>Author: {book.author?.name}</p> {/* Display author's name */}
+              <p>Rating: {book.rating === 0 ? 'Not Rated' : book.rating}</p> {/* Display "Not Rated" if rating is 0 */}              <p>Author: {book.author?.name}</p> {/* Display author's name */}
               <p>Author Description: {book.author?.description}</p> {/* Author description */}
               <p>Genre: {book.genre?.name}</p> {/* Display genre name */}
               <p>Genre Description: {book.genre?.description}</p> {/* Genre description */}
+              {/* Delete button */}
+              <button onClick={() => handleDelete(book.id)}>Delete</button>
             </div>
           ))
         )}
