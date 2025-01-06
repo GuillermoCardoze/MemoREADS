@@ -34,11 +34,7 @@ class Books(Resource):
             genre_id = request_json['genre_id']
 
             try:
-                book = Book(title=title,
-                            rating=rating,
-                            author_id=author_id,
-                            genre_id=genre_id, 
-                            user_id=user_id)
+                book = Book(title=title,rating=rating,author_id=author_id,genre_id=genre_id, user_id=user_id)
 
 
                 db.session.add(book)
@@ -107,21 +103,14 @@ api.add_resource(BooksById, '/books/<int:id>')
 
 class Authors(Resource):
     def get(self):
-        user_id = session.get('user_id')
-        if not user_id:
-            return {'error': '401 Unauthorized'}, 401
+        if session.get('user_id'):
+            authors = Author.query.all()
 
-        # Fetch the user
-        user = User.query.get(user_id)
-        if not user:
-            return {'error': '404 Not Found'}, 404
+            return [author.to_dict() for author in authors], 200
+        
+        return {'error': '401 Unauthorized'}, 401    
 
-        # Use the association proxy to get authors
-        authors = user.authors  # Association proxy automatically retrieves distinct authors
 
-        # Serialize and return the authors
-        return [author.to_dict() for author in authors], 200
-    
     def post(self):
         user_id = session.get('user_id')
         if not user_id:
@@ -206,12 +195,11 @@ api.add_resource(AuthorsById, "/authors/<int:id>")
 class Genres(Resource):
     def get(self):
         if session.get('user_id'):
-            # Fetch genres associated with books owned by the current user
-            genres = Genre.query.join(Book).filter(Book.user_id == session['user_id']).all()
+            genres = Genre.query.all()
 
             return [genre.to_dict() for genre in genres], 200
-
-        return {'error': '401 Unauthorized'}, 401
+        
+        return {'error': '401 Unauthorized'}, 401    
     
     def post(self):
         # Check if the user is logged in (session contains user_id)

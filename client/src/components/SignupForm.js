@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { signup } from '../slices/userSlice';
+import { useNavigate } from 'react-router-dom';
 // import { signup } from './userSlice'; // Import the signup action
 
 const SignupForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -21,6 +23,7 @@ const SignupForm = () => {
     e.preventDefault();
     dispatch(signup(formData))
       .then(() => {
+        navigate('/books')
         // Handle successful signup (redirect, display a success message, etc.)
       })
       .catch((error) => {

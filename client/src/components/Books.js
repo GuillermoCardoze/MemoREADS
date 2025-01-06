@@ -18,6 +18,8 @@ const Books = () => {
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
       
+      {/* New Book Form */}
+      <NewBookForm />
       {/* Display books */}
       <div>
         {books.length === 0 ? (
@@ -36,8 +38,7 @@ const Books = () => {
         )}
       </div>
 
-      {/* New Book Form */}
-      <NewBookForm />
+      
     </div>
   );
 };

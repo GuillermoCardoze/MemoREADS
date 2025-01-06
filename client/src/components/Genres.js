@@ -5,6 +5,7 @@ import { fetchGenres } from '../slices/userSlice'; // Redux action to fetch genr
 import NewGenreForm from './NewGenreForm'; // Import the form
 
 const Genres = () => {
+  console.log('Genres component rendered');
   const dispatch = useDispatch();
   // const navigate = useNavigate();
   const { genres, loading, error } = useSelector((state) => state.users); // Access genres from Redux store

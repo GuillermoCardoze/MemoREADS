@@ -22,16 +22,17 @@ class Book(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='books')
 
     # Serialization rules
-    serialize_rules = ('-author.books', '-genre.books', '-user.books', 'author', 'genre')   
+    # serialize_rules = ('-author.books', '-genre.books', '-user.books', 'author', 'genre')   
+    serialize_rules = ('-author.books', '-genre.books', '-user.books')   
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'title': self.title,
-            'rating': self.rating,
-            'author': self.author.to_dict() if self.author else None,
-            'genre': self.genre.to_dict() if self.genre else None,
-        }
+    # def to_dict(self):
+    #     return {
+    #         'id': self.id,
+    #         'title': self.title,
+    #         'rating': self.rating,
+    #         'author': self.author.to_dict() if self.author else None,
+    #         'genre': self.genre.to_dict() if self.genre else None,
+    #     }
 
     @validates('title')
     def validate_title(self, key, title):
@@ -134,16 +135,17 @@ class User(db.Model, SerializerMixin):
     genres = association_proxy('books', 'genre', creator=lambda genre: Book(genre=genre))
 
     # Serialization rules
-    serialize_rules = ('-books.user', '-password_hash', 'books.author', 'books.genre', 'authors', 'genres')
+    serialize_rules = ('-books.user', '-password_hash')
+    # serialize_rules = ('-books.user', '-password_hash', 'books.author', 'books.genre', 'authors', 'genres')
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'username': self.username,
-            'books': [book.to_dict() for book in self.books],  # Serialize books
-            'authors': [author.to_dict() for author in self.authors],  # Serialize authors
-            'genres': [genre.to_dict() for genre in self.genres],  # Serialize genres
-        }
+    # def to_dict(self):
+    #     return {
+    #         'id': self.id,
+    #         'username': self.username,
+    #         'books': [book.to_dict() for book in self.books],  # Serialize books
+    #         'authors': [author.to_dict() for author in self.authors],  # Serialize authors
+    #         'genres': [genre.to_dict() for genre in self.genres],  # Serialize genres
+    #     }
    
 
     @validates("username")
