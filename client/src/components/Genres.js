@@ -22,7 +22,7 @@ const Genres = () => {
 
   return (
     <div>
-      <h2>Genres List</h2>
+      <h2>All Genres List</h2>
       
       {/* NewGenreForm will be displayed below the genres list */}
       <NewGenreForm />

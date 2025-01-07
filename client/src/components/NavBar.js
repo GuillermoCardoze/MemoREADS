@@ -17,7 +17,8 @@ const NavBar = () => {
           <button onClick={() => navigate('/authors')}>All Authors</button>
           <button onClick={() => navigate('/genres')}>All Genres</button>
           {/* <button onClick={() => navigate('/login')}>Logout</button> */}
-          <Logout />
+          
+          <Logout />          
         </div>
       ) : (
         <div>

@@ -18,7 +18,7 @@ const Authors = () => {
 
   return (
     <div>
-      <h1>Authors</h1>
+      <h1>All Authors</h1>
       <NewAuthorForm />
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}

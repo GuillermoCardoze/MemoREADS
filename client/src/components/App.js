@@ -28,7 +28,13 @@ function App() {
   return (
     <Router>
       <NavBar /> 
-      <h1>MemoREADS</h1>
+      <h1>MemoREADS App</h1>
+       {/* Display username if logged in */}
+       {isLoggedIn && (
+        <div>
+          <h1>Welcome, {user.username}!</h1>
+        </div>
+      )}
       <Routes>
         {/* Redirect to /books if logged in, else to /login */}
         <Route path="/" element={isLoggedIn ? <Navigate to="/books" /> : <Navigate to="/login" />} />

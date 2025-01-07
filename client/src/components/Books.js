@@ -33,12 +33,12 @@ const Books = () => {
           books.map((book) => (
             <div key={book.id}>
               <h3>{book.title}</h3>
-              <p>Rating: {book.rating === 0 ? 'Not Rated' : book.rating}</p> {/* Display "Not Rated" if rating is 0 */}
-              
-              {/* Button to update rating */}
+              <p>Rating: {book.rating === 0 ? 'Not Rated' : book.rating}   
               <Link to={`/ratings/${book.id}`}>
                 <button>Update Rating</button>
-              </Link>
+              </Link></p> {/* Display "Not Rated" if rating is 0 */}
+
+              
 
               <p>Author: {book.author?.name}</p> {/* Display author's name */}
               {/* <p>Author Description: {book.author?.description}</p> Author description */}
