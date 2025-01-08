@@ -9,7 +9,7 @@ const Books = () => {
   const { user, loading, error } = useSelector((state) => state.users); // Access user object from Redux store
 
   useEffect(() => {
-    if (!user.books || user.books.length === 0) {
+    if (!user.books) {
       dispatch(fetchBooks()); // Fetch books if they are not loaded
     }
   }, [dispatch, user.books]);
