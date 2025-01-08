@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBooks, deleteBook } from '../slices/userSlice';
 import NewBookForm from './NewBookForm';
@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 const Books = () => {
   const dispatch = useDispatch();
   const { user, loading, error } = useSelector((state) => state.users); // Access user object from Redux store
-  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
   useEffect(() => {
     if (!user.books || user.books.length === 0) {
@@ -19,15 +18,7 @@ const Books = () => {
     dispatch(deleteBook(id)); // Delete a book by its ID
   };
 
-  const toggleUnreadFilter = () => {
-    setShowUnreadOnly((prev) => !prev);
-  };
-
-  // Filter books based on unread state
-  const filteredBooks = showUnreadOnly
-    ? user.books.filter((book) => book.rating === 0)
-    : user.books;
-
+  // Map through user.books to display each book's details
   return (
     <div>
       <h2>Books</h2>
@@ -37,14 +28,6 @@ const Books = () => {
       {/* New Book Form */}
       <NewBookForm />
 
-      
-
-
-      {/* Button to toggle unread books filter */}
-      <button onClick={toggleUnreadFilter}>
-        {showUnreadOnly ? 'Show All Books' : 'Show Unread Books'}
-      </button>
-      <br></br>
       {/* Link to User Genres */}
       <Link to="/user-genres">
         <button>My Genres</button>
@@ -56,17 +39,17 @@ const Books = () => {
       
       {/* Display books */}
       <div>
-        {filteredBooks.length === 0 ? (
+        {user.books.length === 0 ? (
           <p>No books available.</p>
         ) : (
-          filteredBooks.map((book) => {
-            const { author, genre } = book; // Assuming book has 'author' and 'genre' properties
+          user.books.map((book) => {
+            const { id, title, rating, author, genre } = book; // Destructure book data
             return (
-              <div key={book.id}>
-                <h3>{book.title}</h3>
+              <div key={id}>
+                <h3>{title}</h3>
                 <p>
-                  Rating: {book.rating === 0 ? 'Not Rated' : book.rating}
-                  <Link to={`/ratings/${book.id}`}>
+                  Rating: {rating === 0 ? 'Not Rated' : rating}
+                  <Link to={`/ratings/${id}`}>
                     <button>Update Rating</button>
                   </Link>
                 </p>
@@ -76,7 +59,7 @@ const Books = () => {
                 <p>Genre: {genre ? genre.name : 'Unknown'}</p>
                 
                 {/* Delete button */}
-                <button onClick={() => handleDelete(book.id)}>Delete</button>
+                <button onClick={() => handleDelete(id)}>Delete</button>
               </div>
             );
           })

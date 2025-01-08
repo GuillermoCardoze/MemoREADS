@@ -282,12 +282,21 @@ const userSlice = createSlice({
       .addCase(updateBook.fulfilled, (state, action) => { state.loading = false; state.user.books = state.user.books.map((book) => book.id === action.payload.id ? action.payload : book); })
       .addCase(updateBook.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(deleteBook.pending, (state) => { state.loading = true; })
-      .addCase(deleteBook.fulfilled, (state, action) => { state.loading = false 
-        const filteredBooks = state.user.books.filter()
-        state.user = {...state.user, books: filteredBooks}
-        // state.user.books = state.user.books.filter((book) => book.id !== action.payload)
-    })
-      .addCase(deleteBook.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+      .addCase(deleteBook.fulfilled, (state, action) => {
+        state.loading = false;
+      
+        // Filter out the deleted book
+        const filteredBooks = state.user.books.filter(book => book.id !== action.payload);
+      
+        // Update state with the filtered books
+        state.user = {
+          ...state.user,
+          books: filteredBooks,
+          authors: filteredBooks.map(book => book.author),
+          genres: filteredBooks.map(book => book.genre),
+        };
+      })
+            .addCase(deleteBook.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       // Handle Authors actions
       .addCase(fetchAuthors.pending, (state) => { state.loading = true; })
