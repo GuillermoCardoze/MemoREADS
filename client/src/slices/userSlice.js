@@ -207,13 +207,11 @@ export const deleteGenre = createAsyncThunk('users/deleteGenre', async (id, { re
 const userSlice = createSlice({
   name: 'users',
   initialState: {
-    // user: null,
     user: {
         books: [],
         authors: [],
         genres: [],
     },
-    // books: [],
     authors: [],
     genres: [],
     loading: false,
@@ -224,20 +222,44 @@ const userSlice = createSlice({
     // Handle user-related actions
     builder
       .addCase(signup.pending, (state) => { state.loading = true; state.error = null; })
-      .addCase(signup.fulfilled, (state, action) => { state.loading = false; state.user = action.payload; })
+    //   .addCase(signup.fulfilled, (state, action) => { state.loading = false; state.user = action.payload; })
+      .addCase(signup.fulfilled, (state, action) => {
+          state.loading = false;
+          state.user = action.payload; // Populate user data
+          // Populate books, authors, and genres
+          state.user.books = action.payload.books || [];
+          state.user.authors = action.payload.authors || [];
+          state.user.genres = action.payload.genres || [];
+        })
       .addCase(signup.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(signin.pending, (state) => { state.loading = true; state.error = null; })
-      .addCase(signin.fulfilled, (state, action) => { state.loading = false; state.user = action.payload; })
+    //   .addCase(signin.fulfilled, (state, action) => { state.loading = false; state.user = action.payload; })
+      .addCase(signin.fulfilled, (state, action) => {
+          state.loading = false;
+          state.user = action.payload; // Populate user data
+          // Populate books, authors, and genres
+          state.user.books = action.payload.books || [];
+          state.user.authors = action.payload.authors || [];
+          state.user.genres = action.payload.genres || [];
+        })
       .addCase(signin.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(logout.pending, (state) => { state.loading = true; })
       .addCase(logout.fulfilled, (state) => { state.loading = false; state.user = null; })
       .addCase(logout.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(checkSession.pending, (state) => { state.loading = true; })
+    //   .addCase(checkSession.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   state.user = action.payload; // Automatically log in the user from the session
+    //   console.log('checkSession payload:', action.payload);
+    //   })
       .addCase(checkSession.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload; // Automatically log in the user from the session
-      console.log('checkSession payload:', action.payload);
-      })
+          state.loading = false;
+          state.user = action.payload; // Automatically log in the user from the session
+          // Populate user.books, user.authors, and user.genres
+          state.user.books = action.payload.books || [];
+          state.user.authors = action.payload.authors || [];
+          state.user.genres = action.payload.genres || [];
+        })
       .addCase(checkSession.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload; // Session expired or user not logged in
