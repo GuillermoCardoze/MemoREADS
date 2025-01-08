@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { signin } from '../slices/userSlice';
-// import { signin } from './userSlice'; // Import the signin action
 import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.users.user); // Get user data from Redux store
 
   const [formData, setFormData] = useState({
     username: '',
@@ -22,16 +22,14 @@ const LoginForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(signin(formData))
-      .then(() => {
-        // Handle successful login (redirect, display a success message, etc.)
-        navigate('/books');
-
-      })
-      .catch((error) => {
-        console.error('Login failed', error);
-      });
+    dispatch(signin(formData));
   };
+
+  useEffect(() => {
+    if (user && user.books) {
+      navigate('/books'); // Navigate to '/books' if user has books
+    }
+  }, [user, navigate]);
 
   return (
     <form onSubmit={handleSubmit}>

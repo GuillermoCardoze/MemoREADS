@@ -1,35 +1,35 @@
+// Genres.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGenres } from '../slices/userSlice'; // Redux action to fetch genres
-// import { useNavigate } from 'react-router-dom';
 import NewGenreForm from './NewGenreForm'; // Import the form
 
 const Genres = () => {
-  console.log('Genres component rendered');
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
   const { genres, loading, error } = useSelector((state) => state.users); // Access genres from Redux store
-  
+
   // Fetch genres when the component is mounted
   useEffect(() => {
     dispatch(fetchGenres());
   }, [dispatch]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-
-  console.log(genres)
-
   return (
     <div>
-      <h2>All Genres List</h2>
-      
-      {/* NewGenreForm will be displayed below the genres list */}
-      <NewGenreForm />
-
+      <h1>All Genres</h1>
+      <NewGenreForm /> {/* Display the new genre form */}
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error}</p>}
       <ul>
         {genres.map((genre) => (
-          <li key={genre.id}>{genre.name}: {genre.description}</li>
+          <li key={genre.id}>
+            <span>
+              Genre Name: {genre.name}
+              <br />
+              Genre Description: {genre.description}
+              <br />
+              <br />
+            </span>
+          </li>
         ))}
       </ul>
     </div>

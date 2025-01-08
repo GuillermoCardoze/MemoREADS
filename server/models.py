@@ -135,7 +135,7 @@ class User(db.Model, SerializerMixin):
     genres = association_proxy('books', 'genre', creator=lambda genre: Book(genre=genre))
 
     # Serialization rules
-    serialize_rules = ('-books.user', '-password_hash')
+    serialize_rules = ('-books.user', '-_password_hash')
     # serialize_rules = ('-books.user', '-password_hash', 'books.author', 'books.genre', 'authors', 'genres')
 
     # def to_dict(self):

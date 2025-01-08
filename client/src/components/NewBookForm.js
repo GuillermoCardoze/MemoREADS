@@ -30,7 +30,7 @@ const NewBookForm = () => {
     };
 
     fetchOptions();
-  }, []);
+  }, [dispatch]);
 
   // Formik setup for managing form state
   const formik = useFormik({

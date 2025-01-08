@@ -117,7 +117,7 @@ export const postAuthor = createAsyncThunk('users/postAuthor', async (authorData
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(authorData),
     });
-    if (!response.ok) throw new Error('Failed to post author');
+    if (!response.ok) throw new Error('Author already exits');
     return await response.json();
   } catch (error) {
     return rejectWithValue(error.message);
@@ -168,7 +168,7 @@ export const postGenre = createAsyncThunk('users/postGenre', async (genreData, {
         body: JSON.stringify(genreData),
       });
   
-      if (!response.ok) throw new Error('Failed to post genre');
+      if (!response.ok) throw new Error('Genre already exist.');
       
       const data = await response.json();
       console.log("Posted Genre:", data);
@@ -207,8 +207,13 @@ export const deleteGenre = createAsyncThunk('users/deleteGenre', async (id, { re
 const userSlice = createSlice({
   name: 'users',
   initialState: {
-    user: null,
-    books: [],
+    // user: null,
+    user: {
+        books: [],
+        authors: [],
+        genres: [],
+    },
+    // books: [],
     authors: [],
     genres: [],
     loading: false,
@@ -231,6 +236,7 @@ const userSlice = createSlice({
       .addCase(checkSession.fulfilled, (state, action) => {
       state.loading = false;
       state.user = action.payload; // Automatically log in the user from the session
+      console.log('checkSession payload:', action.payload);
       })
       .addCase(checkSession.rejected, (state, action) => {
       state.loading = false;
@@ -241,16 +247,46 @@ const userSlice = createSlice({
       
      // Handle Books actions
       .addCase(fetchBooks.pending, (state) => { state.loading = true; })
-      .addCase(fetchBooks.fulfilled, (state, action) => { state.loading = false; state.books = action.payload; })
+      .addCase(fetchBooks.fulfilled, (state, action) => { 
+        state.loading = false;
+        state.user.books = action.payload 
+        // state.user.authors = action.payload.authors; // Populate authors
+        // state.user.genres = action.payload.genres; // Populate genres
+    })
       .addCase(fetchBooks.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(postBook.pending, (state) => { state.loading = true; })
-      .addCase(postBook.fulfilled, (state, action) => { state.loading = false; state.books.push(action.payload); })
+      .addCase(postBook.fulfilled, (state, action) => { 
+        state.loading = false 
+       // state.user.books.push(action.payload); 
+        state.user = {...state.user, books: [...state.user.books, action.payload]}
+        //if state.user authors does not have the action.payloads author add to state.user.authors
+        // Add the author if not already present
+        state.user = {
+            ...state.user,
+            authors: state.user.authors.includes(action.payload.author)
+                ? state.user.authors
+                : [...state.user.authors, action.payload.author],
+        };
+        //if state.user genres does not have the action.payloads genre add to state.user.genres
+        // Add the genre if not already present
+        state.user = {
+            ...state.user,
+            genres: state.user.genres.includes(action.payload.genre)
+                ? state.user.genres
+                : [...state.user.genres, action.payload.genre],
+        };
+    })
+
       .addCase(postBook.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(updateBook.pending, (state) => { state.loading = true; })
-      .addCase(updateBook.fulfilled, (state, action) => { state.loading = false; state.books = state.books.map((book) => book.id === action.payload.id ? action.payload : book); })
+      .addCase(updateBook.fulfilled, (state, action) => { state.loading = false; state.user.books = state.user.books.map((book) => book.id === action.payload.id ? action.payload : book); })
       .addCase(updateBook.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(deleteBook.pending, (state) => { state.loading = true; })
-      .addCase(deleteBook.fulfilled, (state, action) => { state.loading = false; state.books = state.books.filter((book) => book.id !== action.payload); })
+      .addCase(deleteBook.fulfilled, (state, action) => { state.loading = false 
+        const filteredBooks = state.user.books.filter()
+        state.user = {...state.user, books: filteredBooks}
+        // state.user.books = state.user.books.filter((book) => book.id !== action.payload)
+    })
       .addCase(deleteBook.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       // Handle Authors actions

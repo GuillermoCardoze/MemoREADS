@@ -27,9 +27,9 @@ const Authors = () => {
           <li key={author.id}>
             
             <span>
-                Author Name: {author.description}
+                Author Name: {author.name}
                 <br></br>
-                Author Description: {author.name}
+                Author Description: {author.description}
                 <br></br>
                 <br></br>
             </span>

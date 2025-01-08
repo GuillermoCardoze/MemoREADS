@@ -12,10 +12,12 @@ import NavBar from './NavBar';
 import NewGenreForm from './NewGenreForm';
 import NewBookForm from './NewBookForm';
 import Ratings from './Ratings';
+import UserAuthors from './UserAuthors';
+import UserGenres from './UserGenres';
 
 function App() {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.users.user); // Get user data from Redux store
+  const user = useSelector((state) => state.users.user); 
 
   // Dispatch checkSession on app load
   useEffect(() => {
@@ -45,7 +47,9 @@ function App() {
         <Route path="/ratings/:bookId" element={isLoggedIn ? <Ratings /> : <Navigate to="/login" />} />
         <Route path="/genres" element={isLoggedIn ? <Genres /> : <Navigate to="/login" />} />
         <Route path="/add-genre" element={isLoggedIn ? <NewGenreForm /> : <Navigate to="/login" />} />
+        <Route path="/user-genres" element={isLoggedIn ? <UserGenres /> : <Navigate to="/login" />} />
         <Route path="/authors" element={isLoggedIn ? <Authors /> : <Navigate to="/login" />} />
+        <Route path="/user-authors" element={isLoggedIn ? <UserAuthors /> : <Navigate to="/login" />} />
 
         {/* Routes for login and signup */}
         <Route path="/login" element={!isLoggedIn ? <LoginForm /> : <Navigate to="/books" />} />

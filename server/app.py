@@ -125,8 +125,15 @@ class Authors(Resource):
         name = request_json.get('name')
         description = request_json.get('description')
 
+
+
         if not name or not description:
             return {'error': 'Name and description are required'}, 400
+
+        # Check if the author already exists
+        if Author.query.filter_by(name=name).first():
+            return print({'error': 'Author already exists'}), 400
+            
 
         # Create and save the new author
         try:
@@ -141,10 +148,12 @@ class Authors(Resource):
             return author.to_dict(), 201
 
         except IntegrityError:
+            db.session.rollback()
             return {'error': 'Unable to create author'}, 500
 
 
 api.add_resource(Authors, "/authors")
+
 
 class AuthorsById(Resource):
     def get(self, id):
@@ -206,25 +215,40 @@ class Genres(Resource):
         return {'error': '401 Unauthorized'}, 401    
     
     def post(self):
-        # Check if the user is logged in (session contains user_id)
-        if not session.get('user_id'):
-            return {'error': '401 Unauthorized'}, 401
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'error': 'Unauthorized'}, 401
 
-        # Assuming genre data is coming in the request body
-        data = request.get_json()
-
-        # Create a new genre from the provided data
-        new_genre = Genre(
-            name=data.get('name'),
-            description=data.get('description')
-        )
-
-        # Add the genre to the session and commit
-        db.session.add(new_genre)
-        db.session.commit()
+        # Get the author data from the request
+        request_json = request.get_json()
+        name = request_json.get('name')
+        description = request_json.get('description')
 
 
-        return new_genre.to_dict(), 201
+
+        if not name or not description:
+            return {'error': 'Name and description are required'}, 400
+
+        # Check if the author already exists
+        if Genre.query.filter_by(name=name).first():
+            return print({'error': 'Genre already exists'}), 400
+            
+
+        # Create and save the new genre
+        try:
+            # Instead of passing user_id directly, you create the genre normally
+            genre = Genre(name=name, description=description)
+            # Associate the genre with the logged-in user
+            genre.user = User.query.get(user_id)  # Associate the current user with the genre
+
+            db.session.add(genre)
+            db.session.commit()
+
+            return genre.to_dict(), 201
+
+        except IntegrityError:
+            db.session.rollback()
+            return {'error': 'Unable to create genre'}, 500
         
 api.add_resource(Genres, "/genres")
 
@@ -347,6 +371,31 @@ class CheckSession(Resource):
             }
             for book in user.books
         ]
+        user_authors = []
+        for author in user.authors:
+            auth = {
+                    "id": author.id,
+                    "name": author.name,
+                    "description": author.description
+                }
+            if auth not in user_authors:
+                # breakpoint()
+                
+                user_authors.append(auth)
+        user_dict['authors'] = user_authors
+
+        user_genres = []
+        for genre in user.genres:
+            gen = {
+                    "id": genre.id,
+                    "name": genre.name,
+                    "description": genre.description
+                }
+            if gen not in user_genres:
+                
+                user_genres.append(gen)
+        user_dict['genres'] = user_genres
+        
         return user_dict, 200
     
 api.add_resource(CheckSession, '/check_session')
