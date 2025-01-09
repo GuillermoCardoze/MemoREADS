@@ -39,7 +39,7 @@ function App() {
       )}
       <Routes>
         {/* Redirect to /books if logged in, else to /login */}
-        <Route path="/" element={isLoggedIn ? <Navigate to="/books" /> : <Navigate to="/login" />} />
+        {/* <Route path="/" element={isLoggedIn ? <Navigate to="/books" /> : <Navigate to="/login" />} /> */}
 
         {/* Routes for logged in users */}
         <Route path="/books" element={isLoggedIn ? <Books /> : <Navigate to="/login" />} />
