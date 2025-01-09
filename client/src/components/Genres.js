@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchGenres } from '../slices/userSlice'; 
 import NewGenreForm from './NewGenreForm'; 
 
+
 const Genres = () => {
   const dispatch = useDispatch();
   const { genres, loading, error } = useSelector((state) => state.users); // Access genres from Redux store
@@ -15,7 +16,7 @@ const Genres = () => {
 
   return (
     <div>
-      <h1>All Genres</h1>
+      <h2>All Genres</h2>
       <NewGenreForm /> {/* Display the new genre form */}
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}

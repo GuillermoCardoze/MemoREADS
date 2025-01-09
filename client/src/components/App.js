@@ -14,7 +14,7 @@ import NewBookForm from './NewBookForm';
 import Ratings from './Ratings';
 import UserAuthors from './UserAuthors';
 import UserGenres from './UserGenres';
-import './styles.css'
+// import './styles.css'
 
 function App() {
   const dispatch = useDispatch();
@@ -32,7 +32,6 @@ function App() {
     <Router>
       <NavBar /> 
       <h1>MemoREADS App</h1>
-       {/* Display username if logged in */}
        {isLoggedIn && (
         <div>
           <h1>Welcome, {user.username}!</h1>
@@ -40,7 +39,7 @@ function App() {
       )}
       <Routes>
         {/* Redirect to /books if logged in, else to /login */}
-        {/* <Route path="/" element={isLoggedIn ? <Navigate to="/books" /> : <Navigate to="/login" />} /> */}
+        <Route path="/" element={isLoggedIn ? <Navigate to="/books" /> : <Navigate to="/login" />} />
 
         {/* Routes for logged in users */}
         <Route path="/books" element={isLoggedIn ? <Books /> : <Navigate to="/login" />} />

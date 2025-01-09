@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAuthors } from '../slices/userSlice'; 
 import NewAuthorForm from './NewAuthorForm';
 
+
 const Authors = () => {
   const dispatch = useDispatch();
   const { authors, loading, error } = useSelector((state) => state.users); // Access authors from state
@@ -14,7 +15,7 @@ const Authors = () => {
 
   return (
     <div>
-      <h1>All Authors</h1>
+      <h2>All Authors</h2>
       <NewAuthorForm />
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}

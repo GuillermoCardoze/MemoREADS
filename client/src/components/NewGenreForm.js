@@ -35,7 +35,7 @@ const NewGenreForm = () => {
 
   return (
     <div>
-      <h1>Add New Genre</h1>
+      <h2>Add New Genre</h2>
       <form onSubmit={formik.handleSubmit}>
         <div>
           <label htmlFor="name">Genre Name</label>

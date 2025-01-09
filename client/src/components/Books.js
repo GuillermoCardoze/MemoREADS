@@ -4,6 +4,8 @@ import { deleteBook } from '../slices/userSlice';
 import NewBookForm from './NewBookForm';
 import { Link } from 'react-router-dom';
 
+
+
 const Books = () => {
   const dispatch = useDispatch();
   const { user, loading, error } = useSelector((state) => state.users); // Access user object from Redux store
@@ -18,6 +20,7 @@ const Books = () => {
   // Map through user.books to display each book's details
   return (
     <div>
+      
       <h2>Books</h2>
       {loading && <p>Loading...</p>}
       {error && <p>{error}</p>}
