@@ -1,23 +1,23 @@
 .navbar {
-    position: fixed;       /* Keeps navbar at the top */
-    top: 0;               /* Position from the top */
-    left: 50%;            /* Center horizontally */
-    transform: translateX(-50%); /* Adjust for centering */
-    width: 100%;          /* Full width */
-    background-color: #007BFF; /* Navbar background */
-    color: white;         /* Navbar text color */
-    padding: 10px 20px;   /* Padding */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow */
-    z-index: 100;         /* Ensure it's above other content */
+    position: fixed;      
+    top: 0;              
+    left: 50%;          
+    transform: translateX(-50%); 
+    width: 100%;        
+    background-color: #007BFF; 
+    color: white;          
+    padding: 10px 20px;   
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    z-index: 100;        
   }
   
 body {
     margin: 0;
-    height: 100vh; /* Full viewport height */
+    height: 100vh; 
     display: flex;
-    justify-content: center; /* Horizontally center */
-    align-items: center; /* Vertically center */
-    background-color: #ADD8E6; /* Light blue background */
+    justify-content: center; 
+    align-items: center; 
+    background-color: #ADD8E6; 
     font-family: Arial, sans-serif;
   }
   
