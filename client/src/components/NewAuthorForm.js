@@ -10,7 +10,7 @@ const NewAuthorForm = () => {
   const formik = useFormik({
     initialValues: {
       name: '',
-      description: '',  // Added description field
+      description: '',  
     },
     validate: (values) => {
       const errors = {};
@@ -23,8 +23,8 @@ const NewAuthorForm = () => {
       return errors;
     },
     onSubmit: (values) => {
-      dispatch(postAuthor(values));  // Dispatch the postAuthor action with form values
-      formik.resetForm();  // Reset form after submission
+      dispatch(postAuthor(values)); 
+      formik.resetForm();  
     },
   });
 

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux'; // Import useSelector
+import { useDispatch, useSelector } from 'react-redux'; 
 import { checkSession } from '../slices/userSlice';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; // Import Navigate
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; 
 import LoginForm from './LoginForm'; 
 import SignupForm from './SignupForm'; 
 import Logout from './Logout'; 
@@ -14,6 +14,7 @@ import NewBookForm from './NewBookForm';
 import Ratings from './Ratings';
 import UserAuthors from './UserAuthors';
 import UserGenres from './UserGenres';
+import './styles.css'
 
 function App() {
   const dispatch = useDispatch();

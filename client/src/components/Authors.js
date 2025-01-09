@@ -1,7 +1,6 @@
-// Authors.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAuthors } from '../slices/userSlice'; // Import the necessary actions
+import { fetchAuthors } from '../slices/userSlice'; 
 import NewAuthorForm from './NewAuthorForm';
 
 const Authors = () => {
@@ -12,9 +11,6 @@ const Authors = () => {
     dispatch(fetchAuthors()); // Fetch authors when component mounts
   }, [dispatch]);
 
-//   const handleDelete = (id) => {
-//     dispatch(deleteAuthor(id)); // Handle delete action
-//   };
 
   return (
     <div>
@@ -33,7 +29,6 @@ const Authors = () => {
                 <br></br>
                 <br></br>
             </span>
-            {/* <button onClick={() => handleDelete(author.id)}>Delete</button> */}
           </li>
         ))}
       </ul>

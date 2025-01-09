@@ -1,8 +1,8 @@
 // Genres.js
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchGenres } from '../slices/userSlice'; // Redux action to fetch genres
-import NewGenreForm from './NewGenreForm'; // Import the form
+import { fetchGenres } from '../slices/userSlice'; 
+import NewGenreForm from './NewGenreForm'; 
 
 const Genres = () => {
   const dispatch = useDispatch();

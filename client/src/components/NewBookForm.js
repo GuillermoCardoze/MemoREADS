@@ -8,7 +8,6 @@ const NewBookForm = () => {
   const [authors, setAuthors] = useState([]);
   const [genres, setGenres] = useState([]);
 
-  // Fetch authors and genres from the backend
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -32,28 +31,22 @@ const NewBookForm = () => {
     fetchOptions();
   }, [dispatch]);
 
-  // Formik setup for managing form state
   const formik = useFormik({
     initialValues: {
       title: '',
-      // rating: '',
       authorId: '',
       genreId: '',
     },
     onSubmit: (values) => {
-      // Construct bookData using the form values
       const bookData = {
         title: values.title,
         rating: 0,
-        // rating: values.rating,
         author_id: values.authorId,
         genre_id: values.genreId,
       };
 
-      // Dispatch postBook to Redux with the new book data
       dispatch(postBook(bookData));
 
-      // Reset the form fields after submission
       formik.resetForm();
     },
   });
@@ -72,16 +65,6 @@ const NewBookForm = () => {
             required
           />
         </div>
-        {/* <div>
-          <label>Rating:</label>
-          <input
-            type="number"
-            name="rating"
-            value={formik.values.rating}
-            onChange={formik.handleChange}
-            required
-          />
-        </div> */}
         <div>
           <label>Author:</label>
           <select

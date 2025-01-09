@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const LoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.users.user); // Get user data from Redux store
+  const user = useSelector((state) => state.users.user); 
 
   const [formData, setFormData] = useState({
     username: '',
@@ -27,7 +27,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (user && user.books) {
-      navigate('/books'); // Navigate to '/books' if user has books
+      navigate('/books'); 
     }
   }, [user, navigate]);
 

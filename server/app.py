@@ -358,7 +358,6 @@ class Signin(Resource):
                         "description": author.description
                     }
                 if auth not in user_authors:
-                    # breakpoint()
                     
                     user_authors.append(auth)
             user_dict['authors'] = user_authors
@@ -375,7 +374,6 @@ class Signin(Resource):
                     user_genres.append(gen)
             user_dict['genres'] = user_genres
 
-            # return {'id': user.id, 'username': user.username}, 200
             return make_response(user_dict, 200)
         else:
             return make_response("Invalid Credentials", 401)
@@ -429,7 +427,6 @@ class CheckSession(Resource):
                     "description": author.description
                 }
             if auth not in user_authors:
-                # breakpoint()
                 
                 user_authors.append(auth)
         user_dict['authors'] = user_authors
@@ -449,15 +446,6 @@ class CheckSession(Resource):
         return user_dict, 200
     
 api.add_resource(CheckSession, '/check_session')
-
-# @app.before_request
-# def check_session():
-#     print(session)
-#     if session.get("user_id") is None:
-#         session["user_id"] = None
-#     else:
-#         print("User is logged in")
-#         print(session["user_id"])        
 
 
 if __name__ == '__main__':

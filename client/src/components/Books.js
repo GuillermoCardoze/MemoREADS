@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBooks, deleteBook } from '../slices/userSlice';
+import { deleteBook } from '../slices/userSlice';
 import NewBookForm from './NewBookForm';
 import { Link } from 'react-router-dom';
 
@@ -9,10 +9,6 @@ const Books = () => {
   const { user, loading, error } = useSelector((state) => state.users); // Access user object from Redux store
 
   useEffect(() => {
-    // debugger
-    // if (!user.books) {
-    //   dispatch(fetchBooks()); // Fetch books if they are not loaded
-    // }
   }, [ user]);
 
   const handleDelete = (id) => {

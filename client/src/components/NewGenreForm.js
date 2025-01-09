@@ -7,13 +7,11 @@ import * as Yup from 'yup';
 const NewGenreForm = () => {
   const dispatch = useDispatch();
 
-  // Formik validation schema
   const validationSchema = Yup.object({
     name: Yup.string().required('Genre name is required'),
     description: Yup.string().required('Genre description is required'),
   });
 
-  // Formik form handling
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -22,12 +20,10 @@ const NewGenreForm = () => {
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
-        // Dispatching the postGenre action to add the new genre
         const resultAction = await dispatch(postGenre(values));
 
-        // Check if the postGenre action was successful
         if (resultAction.type === 'users/postGenre/fulfilled') {
-          resetForm(); // Reset the form fields
+          resetForm(); 
         } else {
           console.error('Failed to add genre');
         }
