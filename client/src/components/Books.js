@@ -9,10 +9,11 @@ const Books = () => {
   const { user, loading, error } = useSelector((state) => state.users); // Access user object from Redux store
 
   useEffect(() => {
-    if (!user.books) {
-      dispatch(fetchBooks()); // Fetch books if they are not loaded
-    }
-  }, [dispatch, user.books]);
+    // debugger
+    // if (!user.books) {
+    //   dispatch(fetchBooks()); // Fetch books if they are not loaded
+    // }
+  }, [ user]);
 
   const handleDelete = (id) => {
     dispatch(deleteBook(id)); // Delete a book by its ID

@@ -304,16 +304,22 @@ class Signup(Resource):
     def post(self):
         form_json = request.get_json()
 
-        new_user = User(
+        user = User(
             username = form_json['username'],
             password = form_json['password'],
         )
-        db.session.add(new_user)
+        db.session.add(user)
         db.session.commit()
-        session['user_id'] = new_user.id
+        session['user_id'] = user.id
         print(session['user_id'])
-        return make_response(
-            new_user.to_dict(), 201)
+        user_dict = user.to_dict()
+        user_dict['books'] = []
+        user_dict['authors'] = []
+        user_dict['genres'] = []
+
+        # return {'id': user.id, 'username': user.username}, 200
+        return make_response(user_dict, 200)
+
 api.add_resource(Signup, '/signup')
 
 class Signin(Resource):
@@ -325,8 +331,52 @@ class Signin(Resource):
         if user and user.authenticate(password):
             session['user_id'] = user.id
             print(session['user_id'])
-            return {'id': user.id, 'username': user.username}, 200
-            # return make_response(user.to_dict(), 200)
+            user_dict = user.to_dict()
+            user_dict['books'] = [
+                {
+                    "id": book.id,
+                    "title": book.title,
+                    "rating": book.rating,
+                    "author": {
+                        "id": book.author.id,
+                        "name": book.author.name,
+                        "description": book.author.description,
+                    },
+                    "genre": {
+                        "id": book.genre.id,
+                        "name": book.genre.name,
+                        "description": book.genre.description,
+                    },
+                }
+                for book in user.books
+            ]
+            user_authors = []
+            for author in user.authors:
+                auth = {
+                        "id": author.id,
+                        "name": author.name,
+                        "description": author.description
+                    }
+                if auth not in user_authors:
+                    # breakpoint()
+                    
+                    user_authors.append(auth)
+            user_dict['authors'] = user_authors
+
+            user_genres = []
+            for genre in user.genres:
+                gen = {
+                        "id": genre.id,
+                        "name": genre.name,
+                        "description": genre.description
+                    }
+                if gen not in user_genres:
+                    
+                    user_genres.append(gen)
+            user_dict['genres'] = user_genres
+
+            # return {'id': user.id, 'username': user.username}, 200
+            return make_response(user_dict, 200)
         else:
             return make_response("Invalid Credentials", 401)
         
