@@ -25,7 +25,9 @@
   .navbar-button:hover {
     background-color: #777;
   }
-
+.main {
+  margin-left: 150px;
+}
 .top-center-container {
   position: relative;
   display: flex;

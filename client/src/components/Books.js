@@ -48,8 +48,9 @@ const Books = () => {
               <div key={id}>
                 <h3>{title}</h3>
                 <p>
-                  Rating: {rating === 0 ? 'Not Rated' : rating}
+                  Rating: {rating === 0 ? 'Not Rated' : rating}    
                   <Link to={`/ratings/${id}`}>
+                  <br></br>
                     <button>Update Rating</button>
                   </Link>
                 </p>

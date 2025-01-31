@@ -30,7 +30,9 @@ function App() {
 
   return (
     <Router>
+      
       <NavBar /> 
+      <div className='main'>
       <h1>MemoREADS App</h1>
        {isLoggedIn && (
         <div>
@@ -58,6 +60,7 @@ function App() {
         {/* Logout route */}
         <Route path="/logout" element={<Logout />} />
       </Routes>
+      </div>
     </Router>
   );
 }
